@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F33180D9-8271-487F-B2EB-1FD8230A7529}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UtilClasses.Winforms</RootNamespace>
+    <AssemblyName>UtilClasses.Winforms</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Nuggets\packages\JetBrains.Annotations.2022.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Nuggets\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Binder.cs" />
+    <Compile Include="ButtonSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ButtonSelectForm.Designer.cs">
+      <DependentUpon>ButtonSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CheckedPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CueTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DirectBitmap.cs" />
+    <Compile Include="ExtendedTabCtrl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Extensions\ColorExtensions.cs" />
+    <Compile Include="Extensions\ComboboxExtensions.cs" />
+    <Compile Include="Extensions\ControlsExtensions.cs" />
+    <Compile Include="Extensions\DrawingExtensions.cs" />
+    <Compile Include="Extensions\Enumerables.cs" />
+    <Compile Include="Extensions\Enums.cs" />
+    <Compile Include="Extensions\Layout.cs" />
+    <Compile Include="Extensions\ListBoxExtensions.cs" />
+    <Compile Include="Extensions\ListViewItemExtensions.cs" />
+    <Compile Include="Extensions\RichTextBoxExtensions.cs" />
+    <Compile Include="Extensions\TreeViewExtensions.cs" />
+    <Compile Include="FontBuilder.cs" />
+    <Compile Include="FunctionInputValidator.cs" />
+    <Compile Include="IInputValidator.cs" />
+    <Compile Include="InputForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InputForm.Designer.cs">
+      <DependentUpon>InputForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LabelledCheckbox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LabelledCheckbox.Designer.cs">
+      <DependentUpon>LabelledCheckbox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LabelledCombo.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LabelledCombo.Designer.cs">
+      <DependentUpon>LabelledCombo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LabelledControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LabelledDateTimePicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LabelledDateTimePicker.Designer.cs">
+      <DependentUpon>LabelledDateTimePicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LabelledLabel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LabelledLabel.Designer.cs">
+      <DependentUpon>LabelledLabel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LabelledLinkLabel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LabelledLinkLabel.Designer.cs">
+      <DependentUpon>LabelledLinkLabel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LabelledNumericTextbox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LabelledTextbox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LabelledTextbox.Designer.cs">
+      <DependentUpon>LabelledTextbox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NumericTextbox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NumericTextbox.Designer.cs">
+      <DependentUpon>NumericTextbox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NumpadControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NumpadControl.Designer.cs">
+      <DependentUpon>NumpadControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OkCancelForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OkCancelForm.Designer.cs">
+      <DependentUpon>OkCancelForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="RoundButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RoundedButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Splash\ApiHelp.cs" />
+    <Compile Include="Splash\SplashForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Splash\SplashForm.Designer.cs">
+      <DependentUpon>SplashForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TagList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TagList.Designer.cs">
+      <DependentUpon>TagList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TemporaryCursor.cs" />
+    <Compile Include="BasicManager.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BasicManager.Designer.cs">
+      <DependentUpon>BasicManager.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VerticalLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ButtonSelectForm.resx">
+      <DependentUpon>ButtonSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InputForm.resx">
+      <DependentUpon>InputForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LabelledCheckbox.resx">
+      <DependentUpon>LabelledCheckbox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LabelledCombo.resx">
+      <DependentUpon>LabelledCombo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LabelledDateTimePicker.resx">
+      <DependentUpon>LabelledDateTimePicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LabelledLabel.resx">
+      <DependentUpon>LabelledLabel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LabelledLinkLabel.resx">
+      <DependentUpon>LabelledLinkLabel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LabelledTextbox.resx">
+      <DependentUpon>LabelledTextbox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NumericTextbox.resx">
+      <DependentUpon>NumericTextbox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NumpadControl.resx">
+      <DependentUpon>NumpadControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OkCancelForm.resx">
+      <DependentUpon>OkCancelForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Splash\SplashForm.resx">
+      <DependentUpon>SplashForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TagList.resx">
+      <DependentUpon>TagList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BasicManager.resx">
+      <DependentUpon>BasicManager.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Reload.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common.Dto\Common.Dto.csproj">
+      <Project>{D17E1FDE-755C-4366-9A19-235C0C4B959F}</Project>
+      <Name>Common.Dto</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UtilClasses\UtilClasses.csproj">
+      <Name>UtilClasses</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
