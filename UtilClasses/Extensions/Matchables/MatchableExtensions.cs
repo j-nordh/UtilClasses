@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Common.Interfaces;
 using UtilClasses.Extensions.Dictionaries;
 using UtilClasses.Extensions.Enumerables;
 using UtilClasses.Extensions.Types;
+using UtilClasses.Interfaces;
 
 namespace UtilClasses.Extensions.Matchables
 {

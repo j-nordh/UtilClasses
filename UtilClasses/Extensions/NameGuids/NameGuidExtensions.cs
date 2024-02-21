@@ -1,5 +1,5 @@
-﻿using Common.Dto;
-using Common.Interfaces;
+﻿using UtilClasses.Interfaces;
+using UtilClasses.Dto;
 
 namespace UtilClasses.Extensions.NameGuids
 {

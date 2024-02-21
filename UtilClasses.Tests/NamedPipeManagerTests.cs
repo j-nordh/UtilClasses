@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using Common.Interfaces;
+using UtilClasses.Interfaces;
 using UtilClasses.Dataflow;
 using UtilClasses.Extensions.Bytes;
 using Xunit;

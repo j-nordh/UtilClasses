@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO.Pipes;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using Common.Interfaces;
-using UtilClasses.Extensions.Bytes;
+using UtilClasses.Interfaces;
 
 namespace UtilClasses.Dataflow
 {

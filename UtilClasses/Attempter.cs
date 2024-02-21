@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using Common.Dto;
 
 namespace UtilClasses
 {
@@ -9,7 +8,6 @@ namespace UtilClasses
     {
         public bool IsFaulted { get; private set; }
         public event Action<Exception, string> CaughtException;
-        public Func<Exception, string, LogItem> LogItemGenerator;
 
         public void Do(bool gate, Action a, string when)
         {

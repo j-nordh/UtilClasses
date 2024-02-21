@@ -3,10 +3,11 @@ using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using Common.Interfaces;
 using UtilClasses.Extensions.Tasks;
+using UtilClasses.Interfaces;
 
 namespace UtilClasses.Dataflow;
+
 
 public class NamedPipeServer<T, TPacker> : IDisposable, ISource<T> where TPacker : IBytePacker<T>
 {

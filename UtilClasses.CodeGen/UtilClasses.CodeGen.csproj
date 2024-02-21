@@ -12,7 +12,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Nuggets\SupplyChain.Dto\SupplyChain.Dto.csproj" />
+    <ProjectReference Include="..\..\Nuggets\SupplyChain.Dto\SupplyChain.Dto.csproj" />
     <ProjectReference Include="..\UtilClasses\UtilClasses.csproj" />
   </ItemGroup>
   <ItemGroup>

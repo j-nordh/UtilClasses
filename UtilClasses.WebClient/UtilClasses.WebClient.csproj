@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Common.Dto\Common.Dto.csproj" />
+    <ProjectReference Include="..\UtilClasses.Dto\UtilClasses.Dto.csproj" />
     <ProjectReference Include="..\UtilClasses\UtilClasses.csproj" />
   </ItemGroup>
 

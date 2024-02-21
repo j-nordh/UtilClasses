@@ -108,6 +108,7 @@ namespace UtilClasses.Cli
 
         public static ConsoleWriter Success(this ConsoleWriter wr, string s) => wr.WithColor(wr.SuccessColor, s);
         public static ConsoleWriter Error(this ConsoleWriter wr, string s) => wr.WithColor(wr.ErrorColor, s);
+        public static ConsoleWriter Error(this ConsoleWriter wr, Exception e) => wr.WithColor(wr.ErrorColor, e.Message).WithColor(ConsoleColor.DarkGray,e.StackTrace);
 
         public static ConsoleWriter Attempt(this ConsoleWriter wr, string s, bool result)
         {
