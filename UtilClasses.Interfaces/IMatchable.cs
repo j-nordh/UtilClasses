@@ -1,8 +1,8 @@
 ﻿namespace UtilClasses.Interfaces
 {
-    public interface IMatchable<T>
+    public interface IMatchable<in T>
     {
         int GetMatchHash();
-        bool Matches(T obj);
+        bool Matches(T other);
     }
 }

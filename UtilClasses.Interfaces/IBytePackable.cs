@@ -2,8 +2,7 @@
 {
     public interface IBytePackable
     {
-        int PackedSize { get; }
-
         void Pack(byte[] buffer, int offset);
-    }
+        int PackedSize { get; }
+    }    
 }
