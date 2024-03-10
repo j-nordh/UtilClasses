@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UtilClasses.Extensions.DateTimes;
 using UtilClasses.Interfaces;
+using UtilClasses.Extensions.DateTimes;
 
 namespace UtilClasses
 {

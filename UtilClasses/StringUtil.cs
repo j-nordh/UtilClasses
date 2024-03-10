@@ -14,7 +14,7 @@ namespace UtilClasses
             var sb = new StringBuilder();
             foreach (var part in parts)
             {
-                if(part.IsNullOrEmpty()) continue;
+                if (part.IsNullOrEmpty()) continue;
                 sb.Append(trim ? part.Trim(separator) : part);
                 sb.Append(separator);
             }
@@ -26,19 +26,19 @@ namespace UtilClasses
 
         static StringUtil()
         {
-            _singleTransforms= new List<(Func<string, bool>, Func<string, string>)>();
-            EndsWith("ies",s=>Trim(3)(s)+"y");
+            _singleTransforms = new List<(Func<string, bool>, Func<string, string>)>();
+            EndsWith("ies", s => Trim(3)(s) + "y");
             EndsWith("status", 0);
             EndsWith("ues", 1);
             EndsWith("ses", 2);
             EndsWith("xes", 2);
             EndsWith("s", Trim(1));
-            
+
         }
 
         private static void EndsWith(string ending, Func<string, string> f)
         {
-            _singleTransforms.Add((s=>s.EndsWithIc2(ending), f));
+            _singleTransforms.Add((s => s.EndsWithIc2(ending), f));
         }
 
         private static void EndsWith(string ending, int i) => EndsWith(ending, Trim(i));
@@ -84,75 +84,27 @@ namespace UtilClasses
             var spaces = new string(' ', totalLength - a.Length - b.Length);
             return $"{a}{spaces}{b}";
         }
+        public static string SnakeToCamel(string s)
+        {
+            if (s.Any(char.IsUpper))
+                return s;
+            s = s.ToLower();
+            var b = new StringBuilder();
+            if (s.StartsWith("_"))
+                s = s.Substring(1);
+            b.Append(char.ToUpper(s.First()));
+            bool nextUpper = false;
+            foreach (var c in s.Skip(1))
+            {
+                if(c == '_') { 
+                    nextUpper = true;
+                    continue;
+                }
+                
+                b.Append(nextUpper? char.ToUpper(c) : c);
+                nextUpper = false;
+            }
+            return b.ToString();
+        }
     }
-
-    //public class StringSwitcher
-    //{
-    //    public Func<string, string, bool> DefaultMatcher { get; set; }
-    //    public bool MatchMultiple { get; set; }
-    //    public List<(string needle, Func<string, string, bool> matcher, Action<string> a)> Paths { get; set; }= new();
-    //    public Func<string, string> PreProcess { get; set; } = s => s;
-    //    public event Action<string, Exception> CaughtException;
-    //    public StringSwitcher() { }
-    //    public StringSwitcher(Func<string, Func<string, bool>> matcher)
-    //    {
-    //        DefaultMatcher = (a, b) => matcher(a)(b);
-    //    }
-
-    //    public bool Go(IEnumerable<string> ss) => ss.Aggregate(true, (res, s) => res &= Go(s));
-
-    //    public bool Go(string s)
-    //    {
-    //        try
-    //        {
-    //            var ret = false;
-    //            foreach (var p in Paths)
-    //            {
-    //                if (!p.matcher(s, p.needle))
-    //                    continue;
-    //                p.a(PreProcess(s));
-    //                ret = true;
-    //                if (!MatchMultiple) break;
-    //            }
-    //            return ret;
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            if(null==CaughtException)
-    //            {
-    //                Console.WriteLine(e);
-    //                throw;
-    //            }
-    //            CaughtException?.Invoke(s, e);
-    //            return false;
-    //        }
-            
-    //    }
-
-    //    public StringSwitcher Add(string needle, Func<string, string, bool> matcher, Action<string> a)
-    //    {
-    //        Paths.Add((needle, matcher, a));
-    //        return this;
-    //    }
-
-    //    public StringSwitcher Add(string needle, Action<string> a) => Add(needle, DefaultMatcher, a);
-    //    public StringSwitcher Add(string needle, Action a) => Add(needle, DefaultMatcher, _=>a());
-    //}
-
-    //public class StringSwitcher<T>:StringSwitcher
-    //{
-    //    private readonly T _obj;
-        
-
-    //    public StringSwitcher(T obj)
-    //    {
-    //        _obj = obj;
-    //    }
-    //    public StringSwitcher(T obj, Func<string, Func<string, bool>> matcher) :base(matcher) 
-    //    {
-    //        _obj = obj;
-    //    }
-    //    public StringSwitcher<T> Add(string needle, Expression<Func<T, string>> e) => (StringSwitcher<T>)Add(needle, DefaultMatcher, x => Accessor.FromExpression(e).Set(_obj, x));
-    //    public StringSwitcher<T> Add<T2>(string needle, Func<string, T2> conv, Expression<Func<T, T2>> e) => (StringSwitcher<T>)Add(needle, DefaultMatcher, x => Accessor.FromExpression(e).Set(_obj, conv(x)));
-    //}
 }

@@ -83,6 +83,8 @@ namespace UtilClasses
 
         public BinarySerializer Write<T>(T val)
         {
+            if (null == val)
+                return this;
             Action f;
             if (typeof(T).IsEnum)
                 f = (() => _enumSerializers[EnumSerialization](_writer, val));

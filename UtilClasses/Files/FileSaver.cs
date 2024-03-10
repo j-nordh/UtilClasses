@@ -32,9 +32,6 @@ namespace UtilClasses.Files
             return this;
         }
 
-
-
-
         public FileSaver(string path)
         {
             _path = path;

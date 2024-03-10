@@ -182,7 +182,7 @@ namespace UtilClasses
         {
             if (_isBlocked) return this;
             ApplyIndent();
-            _sb.Append(c,repeat);
+            _sb.Append(c, repeat);
             return this;
         }
 
@@ -354,7 +354,7 @@ namespace UtilClasses
         public IndentingStringBuilder Backspace(int steps = 1)
         {
             if (_isBlocked) return this;
-            _sb.Remove(_sb.Length  - steps, steps);
+            _sb.Remove(_sb.Length - steps, steps);
             return this;
         }
 
@@ -412,7 +412,7 @@ namespace UtilClasses
             if (null == objs)
                 return this;
             var queue = new Queue<T>(objs);
-            if(!queue.Any())
+            if (!queue.Any())
                 return this;
             while (queue.Any())
             {
@@ -604,10 +604,10 @@ namespace UtilClasses
 
         public MultiAppendable(IEnumerable<IAppendable> apps, string? separator = null)
         {
-            if(null == apps)
+            if (null == apps)
                 throw new ArgumentNullException(nameof(apps));
             _apps = apps.ToList();
-            _separator = separator ??"";
+            _separator = separator ?? "";
         }
         public MultiAppendable(params IAppendable[] apps)
         {
@@ -639,6 +639,11 @@ namespace UtilClasses
             {
                 sb = f(sb);
             }
+            return sb;
+        }
+        public static IndentingStringBuilder Inject(this IndentingStringBuilder sb, Func<IndentingStringBuilder, IndentingStringBuilder> f)
+        {
+            sb = f(sb);
             return sb;
         }
         public static IndentingStringBuilder Inject(this IndentingStringBuilder sb, IEnumerable<IInjector> injectors, Func<IInjector, Func<IndentingStringBuilder, IndentingStringBuilder>> f)

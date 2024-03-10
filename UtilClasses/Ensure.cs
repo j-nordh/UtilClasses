@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
@@ -53,7 +54,7 @@ namespace UtilClasses
         }
 
         [ContractAnnotation("obj:null=>halt")]
-        public void NotNull(object? obj, string message)
+        public void NotNull(object obj, string message)
         {
             if (null != obj) return;
             Throw(message);
@@ -137,6 +138,20 @@ namespace UtilClasses
             if (!set.Any()) return;
             Missing(set, kind, location);
         }
+        [ContractAnnotation("message:null => halt")]
+        public void IsDir(string dir)
+        {
+            NotNull(dir, "Please provide a directory");
+            if (Directory.Exists(dir)) return;
+            throw new DirectoryNotFoundException($"The provided path is not a directory: {dir}");
+        }
+        [ContractAnnotation("message:null => halt")]
+        public void IsFile(string file)
+        {
+            NotNull(file, "Please provide a directory");
+            if (File.Exists(file)) return;
+            throw new FileNotFoundException($"The provided path is not a file: {file}");
+        }
 
         void Missing<T>(IEnumerable<T> keys, string kind, string location) => Missing(keys.Select(o => o?.ToString()??"").Join(", "), kind, location);
         void Missing(string ps, string kind, string location)
@@ -144,7 +159,7 @@ namespace UtilClasses
             var msg = $"No {kind} for {ps} found in {location}. Terminating.";
             throw _fEx("", msg);
         }
-        
+
         public void Throw(string msg)
         {
             msg = _location.IsNullOrEmpty()? msg:$"{_location}: {msg}";
@@ -170,6 +185,7 @@ namespace UtilClasses
             arg= _location.IsNullOrEmpty() ? arg: $"{_location}: {arg}";
             throw _fNull(arg);
         }
+        
     }
 
 }
