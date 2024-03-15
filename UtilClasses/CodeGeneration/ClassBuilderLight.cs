@@ -58,7 +58,7 @@ public class ClassBuilderLight
             .AppendLine($"namespace {NameSpace};")
             .MaybeAppendLine(ClassComment.IsNotNullOrEmpty(), ClassComment);
 
-        var baseInitializer = Inherits.IsNullOrEmpty() ? "" : $": base()"; //TODO: arguments
+        var baseInitializer = Inherits.IsNullOrEmpty() ? "" : $": base()"; //Future improvement: arguments
         sb.AppendLines(Attributes.Select(a => $"[{a}]"))
             .AppendLine($"{AccessModifier} {(IsStatic ? "static " : "")}class {Name} {ii}")
             .AppendLine("{")
