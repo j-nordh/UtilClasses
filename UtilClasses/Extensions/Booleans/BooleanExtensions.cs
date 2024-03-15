@@ -39,6 +39,7 @@ namespace UtilClasses.Extensions.Booleans
         public static T TriState<T>(this bool? b, T whenTrue, T whenFalse, T whenNull) => 
             b.HasValue ? b.Value ? whenTrue : whenFalse : whenNull;
 
+        public static bool IsTrue(this bool? b) => b.HasValue && b.Value;
         public static bool All(this IEnumerable<bool> bs) => bs.All(b => b);
     }
 }

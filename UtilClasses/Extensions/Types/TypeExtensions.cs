@@ -40,7 +40,7 @@ namespace UtilClasses.Extensions.Types
             if (t.Name.StartsWithOic("Task"))
                 return t.GenericTypeArguments.Any() ? SaneName(t.GenericTypeArguments.First()) : "void";
             return !t.IsGenericType
-                ? t.Name
+                ? MapTypeName(t.Name)
                 : $"{t.Name.Substring(0, t.Name.Length - 2)}<{SaneName(t.GetGenericArguments().First())}>";
         }
 

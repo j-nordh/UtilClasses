@@ -48,7 +48,7 @@ namespace UtilClasses.Extensions.Strings
         /// </summary>
         /// <param name="value">The string to test.</param>
         /// <returns>true if the value parameter is null or an empty string (""); otherwise, false.</returns>
-        [ContractAnnotation("null=>true")]
+        [ContractAnnotation("value:null => true")]
         public static bool IsNullOrEmpty(this string? value)
         {
             return string.IsNullOrEmpty(value);
@@ -136,7 +136,7 @@ namespace UtilClasses.Extensions.Strings
         /// </summary>
         public static bool Contains(this string? source, string? input, StringComparison comparison)
         {
-            if(source == null) return false;
+            if (source == null) return false;
             if (input == null) return false;
             return source.IndexOf(input, comparison) >= 0;
         }
@@ -148,7 +148,7 @@ namespace UtilClasses.Extensions.Strings
         {
             if (suffix.IsNotNullOrEmpty())
             {
-                maxLength = maxLength - suffix?.Length??0;
+                maxLength = maxLength - suffix?.Length ?? 0;
             }
 
             if (source.Length <= maxLength) return source;
@@ -170,7 +170,7 @@ namespace UtilClasses.Extensions.Strings
 
         public static bool StartsWithAnyOic(this string s, IEnumerable<string> needles) => s.StartsWithAnyOic(needles.ToArray());
         public static bool StartsWithAnyOic(this string s, params string[] needles) => needles.Any(n => s.StartsWith(n, StringComparison.OrdinalIgnoreCase));
-        public static bool StartsWithOic(this string s, string needle) => s.StartsWith(needle, StringComparison.OrdinalIgnoreCase);
+        public static bool StartsWithOic(this string s, string needle) => null == s ? null == needle : s.StartsWith(needle, StringComparison.OrdinalIgnoreCase);
 
         public static bool SwitchOnStartOic(this string s, params (string needle, Action<string> a)[] paths) =>
             s.SwitchOn(StartsWithOic, false, paths);
@@ -215,7 +215,7 @@ namespace UtilClasses.Extensions.Strings
 
         public static bool ContainsOic(this string? s, string s2)
         {
-            return s?.Contains(s2, StringComparison.OrdinalIgnoreCase)??false;
+            return s?.Contains(s2, StringComparison.OrdinalIgnoreCase) ?? false;
         }
         public static int CompareToIc2(this string value1, string value2) => string.Compare(value1, value2, StringComparison.InvariantCultureIgnoreCase);
 
@@ -313,9 +313,10 @@ namespace UtilClasses.Extensions.Strings
             if (null == s) return value == null;
             return s.Equals(value, StringComparison.OrdinalIgnoreCase);
         }
-
+        
         public static bool InOic(this string s, IEnumerable<string> vals) =>
             vals.Any(v => s.Equals(v, StringComparison.OrdinalIgnoreCase));
+        
 
         public static bool InOic(this string s, params string[] vals) => s.InOic(vals.AsEnumerable());
 
@@ -353,10 +354,10 @@ namespace UtilClasses.Extensions.Strings
 
 
 
-        
-        
 
-        
+
+
+
 
 
         public static T As<T>(this string s)
@@ -436,7 +437,7 @@ namespace UtilClasses.Extensions.Strings
         public static string[] SplitLines(this string str, bool removeEmptyEntries = false)
         {
             if (null == str)
-                return new string[]{};
+                return new string[] { };
             return str.Replace("\r", "").Split(new[] { "\n" },
                 removeEmptyEntries ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
         }
@@ -539,6 +540,23 @@ namespace UtilClasses.Extensions.Strings
             int index = str.IndexOfIc2(needle);
             if (index < 0) return "";
             return index == 0 ? str : str.Substring(index);
+        }
+        public static string TrimAll(this string str, params char[] needles) => str.TrimAll(true, needles);
+        public static string TrimAll(this string str, bool whitespace, params char[] needles)
+        {
+            int len;
+            do
+            {
+                len = str.Length;
+                if (whitespace)
+                    str = str.Trim();
+                foreach (var n in needles)
+                {
+                    str = str.Trim(n);
+                }
+            } while (len> str.Length  );
+
+            return str;
         }
 
         public static string TrimEnd(this string str, string end, StringComparison sc = StringComparison.OrdinalIgnoreCase)
@@ -655,7 +673,7 @@ namespace UtilClasses.Extensions.Strings
         public static string Join(this IEnumerable<string> parts, string separator) =>
             string.Join(separator, parts.ToArray());
 
-        public static string Join(this IEnumerable<string> parts, Func<string,string> sep)
+        public static string Join(this IEnumerable<string> parts, Func<string, string> sep)
         {
             var lst = parts.ToList();
             var sb = new StringBuilder();
@@ -1028,7 +1046,7 @@ namespace UtilClasses.Extensions.Strings
             return -1;
         }
 
-        
+
 
     }
 }

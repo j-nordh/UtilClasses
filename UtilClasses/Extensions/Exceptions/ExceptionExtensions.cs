@@ -55,4 +55,12 @@ namespace UtilClasses.Extensions.Exceptions
             return e.GetType();
         }
     }
+    public class TracedException : Exception
+    {
+        public TracedException(string message, Exception inner, string stackTrace): base(message, inner)
+        {
+            StackTrace = stackTrace;
+        }
+        public override string StackTrace { get; }
+    }
 }

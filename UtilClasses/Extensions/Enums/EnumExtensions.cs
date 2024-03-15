@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UtilClasses.Extensions.Integers;
+using UtilClasses.Extensions.Types;
 
 namespace UtilClasses.Extensions.Enums
 {
@@ -154,9 +155,10 @@ namespace UtilClasses.Extensions.Enums
         
         public static T Parse(object o)
         {
-            var s = o.ToString().Trim();
-            if (s.IsInt()) return (T)(object)s.AsInt();
-            return s.ParseAs<T>();
+            var ret = TryParse(o);
+            if(null == ret)
+                throw new ArgumentException($"Could not parse \"{o}\" into a {typeof(T).SaneName()}");
+            return ret.Value;
         }
         public static T? TryParse(object? o)
         {

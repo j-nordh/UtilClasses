@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UtilClasses.Extensions.Strings;
@@ -51,5 +52,6 @@ namespace UtilClasses.Extensions.DateTimes
         public static double TotalMicroSeconds(this TimeSpan ts) => ts.TotalMilliseconds * 1000;
         public static DateTime AddMicroSeconds(this DateTime dt, double us) => dt.AddMilliseconds(us/1000);
         public static bool IsStartOfHour(this DateTime dt) => (dt - dt.ToStartOfHour()).TotalSeconds == 0;
+        public static bool IsWeekend(this DateTime dt) => dt.DayOfWeek == DayOfWeek.Sunday || dt.DayOfWeek == DayOfWeek.Saturday;
     }
 }
