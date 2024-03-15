@@ -41,7 +41,7 @@ namespace UtilClasses.CodeGeneration
                 .AppendLines(injectors.SelectManyStripNull(i => i.Fields))
                 .AppendLine()
                 .Maybe(IsStatic && injectors.SelectMany(i => i.ConstructorArgs).NotNull().Any(), () => sb
-                    .AppendLines($"static {Name}()", $"public {Name}({injectors.SelectManyStripNull(i => i.ConstructorArgs).Join(", ")}){baseInitializer}","{")
+                    .AppendLines($"static {Name}()", $"public {Name}({injectors.SelectManyStripNull(i => i.ConstructorArgs).Join(", ")}){baseInitializer}", "{")
                     .Inject(injectors, i => i.Constructor)
                     .AppendLine("}"))
                 .Inject(injectors, i => i.Methods)
