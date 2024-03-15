@@ -2,9 +2,8 @@
 
 namespace UtilClasses.Interfaces
 {
-    public interface IManager<T, TConfig> : ICrudRepository<TConfig>, IManager where TConfig : class, IHasGuid
+    public interface IManager<TKey, T> : ICrudRepository<TKey, T>, IManager
     {
-        T Fetch(Guid id);
     }
 
     public interface IManager
