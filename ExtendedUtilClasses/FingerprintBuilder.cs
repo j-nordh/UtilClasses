@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
+using ExtendedUtilClasses.Extensions.DateTimes;
 using UtilClasses.Extensions.Bytes;
 using UtilClasses.Extensions.DateTimes;
 using UtilClasses.Extensions.Enumerables;
@@ -38,6 +39,10 @@ public class FingerprintBuilder<T>
         Add(me, f => f.ToString(CultureInfo.InvariantCulture));
 
     public FingerprintBuilder<T> Add(Expression<Func<T, DateTime>> me) =>
+        Add(me, f => f.ToSaneString());
+    public FingerprintBuilder<T> Add(Expression<Func<T, DateOnly>> me) =>
+        Add(me, f => f.ToSaneString());
+    public FingerprintBuilder<T> Add(Expression<Func<T, TimeOnly>> me) =>
         Add(me, f => f.ToSaneString());
 
     public FingerprintBuilder<T> Add(Expression<Func<T, string>> me) =>
