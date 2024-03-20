@@ -68,6 +68,7 @@ public class ApiHelper
     public async Task Start(string[] args, int port)
     {
         _builder = WebApplication.CreateBuilder(args);
+        Port = port;
 
         Helper.SetupDefaultConfig(_builder);
         Helper.SetupLogging(_builder, "");

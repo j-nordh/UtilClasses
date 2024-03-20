@@ -10,8 +10,8 @@ namespace UtilClasses.Cache
 {
     public static class DictCache
     {
-        public static DictCache<T> Create<T>(Func<IEnumerable<T>> refresh) where T : class, IHasId => new DictCache<T>(refresh);
-        public static DictCache<T> Create<T>(long i,Func<IEnumerable<T>> refresh, Func<long, IEnumerable<T>> idRefresh) where T : class, IHasId =>
+        public static DictCache<T> Create<T>(Func<IEnumerable<T>> refresh) where T : class, IHasLongId => new DictCache<T>(refresh);
+        public static DictCache<T> Create<T>(long i,Func<IEnumerable<T>> refresh, Func<long, IEnumerable<T>> idRefresh) where T : class, IHasLongId =>
             i<=0 
                 ? new DictCache<T>(refresh) 
                 : new DictCache<T>(()=>idRefresh(i));
@@ -20,13 +20,13 @@ namespace UtilClasses.Cache
 
         public static DictCache<TId, T> Create<TId, T>(Func<IEnumerable<T>> refresh, Func<T, TId> idExtractor) where T : class 
             => new DictCache<TId, T>(refresh, idExtractor);
-        public static DictCache<TId,T> Create<TId, T>(long i, Func<IEnumerable<T>> refresh, Func<long, IEnumerable<T>> idRefresh, Func<T, TId> idExtractor) where T : class, IHasId =>
+        public static DictCache<TId,T> Create<TId, T>(long i, Func<IEnumerable<T>> refresh, Func<long, IEnumerable<T>> idRefresh, Func<T, TId> idExtractor) where T : class, IHasLongId =>
             i <= 0
                 ? new DictCache<TId, T>(refresh, idExtractor)
                 : new DictCache<TId,T>(() => idRefresh(i), idExtractor);
     }
 
-    public class DictCache<THasId> : DictCache<long, THasId> where THasId : class, IHasId
+    public class DictCache<THasId> : DictCache<long, THasId> where THasId : class, IHasLongId
     {
         public DictCache(Func<IEnumerable<THasId>> refresh):base(refresh, o => o.Id)
         { }

@@ -15,9 +15,9 @@ namespace UtilClasses.Extensions.Matchables
             var ret = new MatchResult<T>();
             var lstA = new List<T>();
             var lstB = new List<T>();
-            if (typeof(T).CanBe<IHasId>())
+            if (typeof(T).CanBe<IHasLongId>())
             {
-                ret = first.Cast<IHasId>().MatchWithId(second.Cast<IHasId>()).Cast<T>();
+                ret = first.Cast<IHasLongId>().MatchWithId(second.Cast<IHasLongId>()).Cast<T>();
                 lstA = ret.UnmatchedFirst.ToList();
                 lstB = ret.UnmatchedSecond.ToList();
                 ret.UnmatchedFirst.Clear();
@@ -52,7 +52,7 @@ namespace UtilClasses.Extensions.Matchables
             return ret;
         }
 
-        public static MatchResult<T> MatchWithId<T>(this IEnumerable<T> first, IEnumerable<T> second) where T : class, IHasId
+        public static MatchResult<T> MatchWithId<T>(this IEnumerable<T> first, IEnumerable<T> second) where T : class, IHasLongId
         {
             var ret = new MatchResult<T>();
             var dict = new Dictionary<long, T>();

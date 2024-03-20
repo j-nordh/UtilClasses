@@ -2,20 +2,13 @@
 
 namespace UtilClasses.Interfaces
 {
-    public interface IHasId
+    public interface IHasId<T>
     {
-        long Id { get; }
+        T Id { get; }
     }
-
-    public interface IHasIntId
-    {
-        int Id { get; }
-    }
-
-    public interface IHasGuid
-    {
-        Guid Id { get; }
-    }
+    public interface IHasLongId:IHasId<long>;
+    public interface IHasIntId: IHasId<int>;
+    public interface IHasGuid : IHasId<Guid>;
 
     public interface IHasCount
     {

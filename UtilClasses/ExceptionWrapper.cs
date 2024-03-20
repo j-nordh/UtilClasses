@@ -14,7 +14,7 @@ namespace UtilClasses
         {
             Title = e.Message,
             StackTrace = e.StackTrace,
-            InnerException = From(e)
+            InnerException = From(e.InnerException)
         };
 
         public Exception Unwrap() => new Exception(Title, InnerException?.Unwrap());

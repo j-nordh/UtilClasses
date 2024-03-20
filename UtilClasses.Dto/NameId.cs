@@ -2,7 +2,7 @@
 
 namespace UtilClasses.Dto
 {
-    public class NameId : IHasNameId
+    public class NameId : IHasLongNameId
     {
         public long Id { get; set; }
 

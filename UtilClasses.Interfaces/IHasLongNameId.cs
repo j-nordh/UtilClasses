@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace UtilClasses.Interfaces
 {
-    public interface IHasNameId : IHasId, IHasName
+    public interface IHasLongNameId : IHasLongId, IHasName
     {
     }
 
-    public class NameId : IHasNameId
+    public class LongNameId : IHasLongNameId
     {
         public string Name { get; set; }
 

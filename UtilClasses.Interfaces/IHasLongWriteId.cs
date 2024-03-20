@@ -1,6 +1,6 @@
 ﻿namespace UtilClasses.Interfaces
 {
-    public interface IHasWriteId : IHasId
+    public interface IHasLongWriteId : IHasLongId
     {
         new long Id { get; set; }
     }

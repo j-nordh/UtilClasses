@@ -33,20 +33,27 @@ public class FingerprintBuilder<T>
 
     public FingerprintBuilder<T> Add(Expression<Func<T, float>> me) =>
         Add(me, f => f.ToString(CultureInfo.InvariantCulture));
+
     public FingerprintBuilder<T> Add<T2>(Expression<Func<T, T2>> me, Fingerprinter<T2> fp) =>
-        Add(me, o=>fp.Get(o));
+        Add(me, o => fp.Get(o));
+
     public FingerprintBuilder<T> Add(Expression<Func<T, double>> me) =>
         Add(me, f => f.ToString(CultureInfo.InvariantCulture));
 
     public FingerprintBuilder<T> Add(Expression<Func<T, DateTime>> me) =>
         Add(me, f => f.ToSaneString());
+
     public FingerprintBuilder<T> Add(Expression<Func<T, DateOnly>> me) =>
         Add(me, f => f.ToSaneString());
+
     public FingerprintBuilder<T> Add(Expression<Func<T, TimeOnly>> me) =>
         Add(me, f => f.ToSaneString());
 
     public FingerprintBuilder<T> Add(Expression<Func<T, string>> me) =>
         Add(me, s => s);
+
+    public FingerprintBuilder<T> Add(Expression<Func<T, bool>> me) =>
+        Add(me, s => s ? "true" : "false");
 
     public FingerprintBuilder<T> Add(Expression<Func<T, Guid>> me) => AddToString(me);
 
@@ -83,11 +90,11 @@ public class FingerprintBuilder<T>
             throw new InvalidOperationException("You need to specify at least one selector.");
 
         return new Fingerprinter<T>(obj =>
-            _valueSelectors
-                .Select(item => item.Value(obj))
-                .NotNull()
-                .ComputeHash(HashAlgorithm)
-                .ToHexString(), 
+                _valueSelectors
+                    .Select(item => item.Value(obj))
+                    .NotNull()
+                    .ComputeHash(HashAlgorithm)
+                    .ToHexString(),
             HashAlgorithm);
     }
 }

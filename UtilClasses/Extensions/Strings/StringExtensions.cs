@@ -60,7 +60,7 @@ namespace UtilClasses.Extensions.Strings
         /// <param name="value">The string to test.</param>
         /// <returns>true if the value parameter is not null or an empty string (""); otherwise, false.</returns>
         [ContractAnnotation("value:null=>false")]
-        public static bool IsNotNullOrEmpty(this string? value) => !value.IsNullOrEmpty();
+        public static bool IsNotNullOrEmpty(this string value) => !value.IsNullOrEmpty();
 
         public static bool IsNotNullOrWhitespace(this string s) => !s.IsNullOrWhitespace();
 
@@ -315,7 +315,7 @@ namespace UtilClasses.Extensions.Strings
         }
         
         public static bool InOic(this string s, IEnumerable<string> vals) =>
-            vals.Any(v => s.Equals(v, StringComparison.OrdinalIgnoreCase));
+            vals.Any(s.EqualsOic);
         
 
         public static bool InOic(this string s, params string[] vals) => s.InOic(vals.AsEnumerable());

@@ -253,7 +253,7 @@ namespace UtilClasses.Extensions.Dictionaries
 
         public static Dictionary<Guid, T> ToDictionary<T>(this IEnumerable<T> items) where T : IHasGuid =>
             items.ToDictionary(i => i.Id, i => i);
-        public static Dictionary<long, T> ToIdDictionary<T>(this IEnumerable<T> items) where T : IHasId =>
+        public static Dictionary<long, T> ToIdDictionary<T>(this IEnumerable<T> items) where T : IHasLongId =>
             items.ToDictionary(i => i.Id, i => i);
         public static List<KeyValuePair<T1, T2>> SnapshotList<T1, T2>(this Dictionary<T1, T2> dict)
         {
