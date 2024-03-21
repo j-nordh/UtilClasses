@@ -147,12 +147,12 @@ public static class ClassBuilderLightExtensions
         return cbl;
     }
 
-    public static ClassBuilderLight Implementing(this ClassBuilderLight cbl, params (string Interface, string Namespace)[] inter)
+    public static ClassBuilderLight Implementing(this ClassBuilderLight cbl, params (string Interface, List<string> Namespace)[] inter)
     {
         if (inter.IsNullOrEmpty())
             return cbl;
         cbl.Implements.AddRange(inter.Select(t => t.Interface).NotNull());
-        var namespaces = cbl.Using.Union(inter.Select(t => t.Namespace)).Distinct().OrderBy(s => s).ToList();
+        var namespaces = cbl.Using.Union(inter.SelectMany(t => t.Namespace)).Distinct().OrderBy(s => s).ToList();
         cbl.Using.Clear();
         cbl.Using.AddRange(namespaces);
         return cbl;
