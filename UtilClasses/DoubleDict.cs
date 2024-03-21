@@ -38,12 +38,12 @@ public class DoubleDict<T1, T2> : IDoubleDict<T1, T2> where T1 : IComparable
     }
     public T1 this[T2 v] => _reverse[v];
     public T2 this[T1 v] => _forward[v];
-    public (T1 a, T2 b) Insert(T1 a, T2 b)
+    public IDoubleDict<T1,T2> Insert(T1 a, T2 b)
     {
         _forward[a] = b;
         _reverse[b] = a;
-        return (a, b);
-    }
+        return this;
+    } 
     public T1 GetOrAdd(T2 val, Func<T1> f) => _reverse.GetOrAdd(val, f);
     public T2 GetOrAdd(T1 val, Func<T2> f) => _forward.GetOrAdd(val, f);
     public bool TryGetValue(T1 val, out T2 ret ) => _forward.TryGetValue(val, out ret);
