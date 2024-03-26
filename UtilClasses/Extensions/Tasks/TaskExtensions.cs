@@ -85,6 +85,23 @@ namespace UtilClasses.Extensions.Tasks
             a(arg1, arg2);
             return Task.CompletedTask;
         };
+        public static Func<T1, T2, T3,Task> AsTask<T1, T2,  T3>(this Action<T1, T2, T3> a) => (arg1, arg2, arg3) =>
+        {
+            a(arg1, arg2, arg3);
+            return Task.CompletedTask;
+        };
+        public static Func<T1, Task> AsActionTask<T1, T2>(this Func<T1, T2> a) => arg1 =>
+        {
+            a(arg1);
+            return Task.CompletedTask;
+        };
+        
+        public static Func<T1, T2,Task<T3>> AsTask<T1, T2, T3>(this Func<T1, T2, T3> f) => (arg1, arg2) => Task.FromResult( f(arg1, arg2));
+        public static Func<T1, T2, Task> AsActionTask<T1, T2, T3>(this Func<T1, T2, T3> f) => (arg1, arg2) =>
+        {
+            f(arg1, arg2);
+            return Task.CompletedTask;
+        };
         public static Task RunAsTask(this Action a) => Task.Run(a);
         public static Task<T> RunAsTask<T>(this Func<T> f) => Task.Run(f);
         public static Task<T> SuccessOrNull<T>(this Task<T> task) where T : class =>
