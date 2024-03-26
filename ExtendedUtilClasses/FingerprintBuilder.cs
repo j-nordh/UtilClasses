@@ -99,22 +99,23 @@ public class FingerprintBuilder<T>
     }
 }
 
-public class Fingerprinter<T>
+public interface IFingerPrinter;
+public class Fingerprinter<T> :IFingerPrinter
 {
-    private readonly Func<T, string> _single;
-    private readonly Func<IEnumerable<T>, string> _multi;
+    private readonly Func<T?, string> _single;
+    private readonly Func<IEnumerable<T>?, string> _multi;
 
-    public Fingerprinter(Func<T, string> single, HashAlgorithm hashAlgorithm)
+    public Fingerprinter(Func<T?, string> single, HashAlgorithm hashAlgorithm)
     {
-        _single = single;
+        _single = o => null == o ? "" : single(o);
         _multi = os => os
             .Select(_single)
             .ComputeHash(hashAlgorithm)
             .ToHexString();
     }
 
-    public string Get(T obj) => _single(obj);
-    public string Get(IEnumerable<T> objs) => _multi(objs);
+    public string Get(T? obj) => _single(obj);
+    public string Get(IEnumerable<T>? objs) => _multi(objs);
 }
 
 public static class FingerprintBuilder
