@@ -181,6 +181,14 @@ namespace UtilClasses.Extensions.Dictionaries
             dict[key] = res;
             return res;
         }
+        public static async Task<TVal> GetOrAdd_Async<TKey, TVal>(this IDictionary<TKey, TVal> dict, TKey key, Func<TKey, Task<TVal>> addFunc)
+        {
+            TVal res;
+            if (dict.TryGetValue(key, out res)) return res;
+            res = await addFunc(key);
+            dict[key] = res;
+            return res;
+        }
 
         public static TVal GetOrAdd<TKey, TVal>(this IDictionary<TKey, TVal> dict, TKey key, TVal defaultValue) => dict.GetOrAdd(key, () => defaultValue);
 
