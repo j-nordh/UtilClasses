@@ -34,14 +34,19 @@ namespace UtilClasses.Extensions.Types
             }
         }
 
-        public static string SaneName(this Type t)
+        public static string SaneName(this Type t) => t.SaneName(false);
+        public static string SaneName(this Type t, bool withNamespace)
         {
-
+            var ns = withNamespace
+                ? t.Namespace + "."
+                : "";
             if (t.Name.StartsWithOic("Task"))
-                return t.GenericTypeArguments.Any() ? SaneName(t.GenericTypeArguments.First()) : "void";
+                return t.GenericTypeArguments.Any() 
+                    ? ns + SaneName(t.GenericTypeArguments.First(), withNamespace) 
+                    : "void";
             return !t.IsGenericType
-                ? MapTypeName(t.Name)
-                : $"{t.Name.Substring(0, t.Name.Length - 2)}<{SaneName(t.GetGenericArguments().First())}>";
+                ? ns + MapTypeName(t.Name)
+                : $"{ns}{t.Name.Substring(0, t.Name.Length - 2)}<{SaneName(t.GetGenericArguments().First())}>";
         }
 
         public static Type AsNullable(this Type t, bool nullable = true)
