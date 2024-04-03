@@ -313,12 +313,19 @@ namespace UtilClasses.Extensions.Strings
             if (null == s) return value == null;
             return s.Equals(value, StringComparison.OrdinalIgnoreCase);
         }
+        public static bool EqualsAnyOic(this string s, IEnumerable<string> vals) =>
+            vals?.Any(s.EqualsOic) ?? false;
         
+        
+        public static bool EqualsAnyOic(this string s, params string[] vals) => s.EqualsAnyOic(vals.AsEnumerable());
+
+        [Obsolete("Use EqualsAnyOic instead")]
         public static bool InOic(this string s, IEnumerable<string> vals) =>
-            vals.Any(s.EqualsOic);
+            vals?.Any(s.EqualsOic) ?? false;
         
 
-        public static bool InOic(this string s, params string[] vals) => s.InOic(vals.AsEnumerable());
+        [Obsolete("Use EqualsAnyOic instead")]
+        public static bool InOic(this string s, params string[] vals) => s.EqualsAnyOic(vals.AsEnumerable());
 
         public static bool AsBoolean(this string? s)
         {
