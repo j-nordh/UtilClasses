@@ -31,8 +31,9 @@ namespace UtilClasses.Extensions.Expressions
                     throw new Exception("Could not generate a suitable accessor");
             }
         }
-        
-        public static Action<TEntity, TProperty> CreateSetter<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> property)
+
+        public static Action<TEntity, TProperty> CreateSetter<TEntity, TProperty>( this
+            Expression<Func<TEntity, TProperty>> property)
         {
             PropertyInfo propertyInfo = GetProperty(property);
 
@@ -44,17 +45,22 @@ namespace UtilClasses.Extensions.Expressions
 
             return Expression.Lambda<Action<TEntity, TProperty>>(body, parameters).Compile();
         }
+
         public static PropertyInfo GetProperty<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> expression)
         {
             var member = GetMemberExpression(expression).Member;
             var property = member as PropertyInfo;
             if (property == null)
             {
-                throw new InvalidOperationException(string.Format("Member with Name '{0}' is not a property.", member.Name));
+                throw new InvalidOperationException(string.Format("Member with Name '{0}' is not a property.",
+                    member.Name));
             }
+
             return property;
         }
-        private static MemberExpression GetMemberExpression<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> expression)
+
+        private static MemberExpression GetMemberExpression<TEntity, TProperty>(this 
+            Expression<Func<TEntity, TProperty>> expression)
         {
             MemberExpression memberExpression = null;
             if (expression.Body.NodeType == ExpressionType.Convert)
@@ -74,7 +80,9 @@ namespace UtilClasses.Extensions.Expressions
 
             return memberExpression;
         }
-        public static Func<TEntity, TProperty> CreateGetter<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> property)
+
+        public static Func<TEntity, TProperty> CreateGetter<TEntity, TProperty>(
+            this Expression<Func<TEntity, TProperty>> property)
         {
             PropertyInfo propertyInfo = GetProperty(property);
 
@@ -88,43 +96,48 @@ namespace UtilClasses.Extensions.Expressions
 
         public static MemberInfo GetMember(this Expression e)
         {
-            var lambda = e as LambdaExpression;
-            if (lambda == null)
-                throw new ArgumentNullException(nameof(e), @"That's not even a lambda expression!");
-            MemberExpression? me = null;
-
-            switch (lambda.Body.NodeType)
+            if (e is not MemberExpression me)
             {
-                case ExpressionType.Convert:
+                //try interpreting it as a lambda expression
+                var lambda = e as LambdaExpression;
+                if (lambda == null)
+                    throw new ArgumentNullException(nameof(e), @"That's not even a lambda expression!");
+                //try casting it directly as a MemberExpression
+                me = lambda.Body as MemberExpression;
+                
+                //special case we _can_ support but probably don't use
+                if (lambda.Body.NodeType == ExpressionType.Convert)
                     me = ((UnaryExpression)lambda.Body).Operand as MemberExpression;
-                    break;
-                case ExpressionType.MemberAccess:
-                    me = lambda.Body as MemberExpression;
-                    break;
             }
+
             if (me == null) throw new ArgumentException("Expressions must be on the form ()=>object.Property");
             return me.Member;
         }
     }
+
     public static class Express
     {
         public static DictionaryBuilder<TKey, TVal> Dict<TKey, TVal>(IEqualityComparer<TKey>? comp = null) => new(comp);
-        public static DictionaryBuilder<string, TVal> StringDict<TVal>(StringComparer? comp = null) => Dict<string, TVal>(comp ?? StringComparer.OrdinalIgnoreCase);
-        
+
+        public static DictionaryBuilder<string, TVal> StringDict<TVal>(StringComparer? comp = null) =>
+            Dict<string, TVal>(comp ?? StringComparer.OrdinalIgnoreCase);
+
 
         public class DictionaryBuilder<TKey, TVal>
         {
             readonly Dictionary<TKey, Expression<Func<TVal>>> _ret;
+
             public DictionaryBuilder(IEqualityComparer<TKey>? comp)
             {
-                _ret = comp == null 
-                    ? new Dictionary<TKey, Expression<Func<TVal>>>() 
+                _ret = comp == null
+                    ? new Dictionary<TKey, Expression<Func<TVal>>>()
                     : new Dictionary<TKey, Expression<Func<TVal>>>(comp);
             }
+
             public Dictionary<TKey, Expression<Func<TVal>>> Done() => _ret;
+
             public DictionaryBuilder<TKey, TVal> On(TKey key, Expression<Func<TVal>> e)
             {
-
                 _ret[key] = e;
                 return this;
             }

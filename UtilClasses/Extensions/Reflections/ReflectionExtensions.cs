@@ -74,6 +74,13 @@ namespace UtilClasses.Extensions.Reflections
         public static bool HasCustomAttribute(this MethodInfo mi, Type t, bool inherit = false) =>
             mi.GetCustomAttributes(t, inherit).Any();
 
+        public static object[] GetCustomAttributes<TCls>(this TCls o, bool inherit = false) =>
+            typeof(TCls).GetCustomAttributes(true);
+        public static TAttr[] GetCustomAttributes<TCls, TAttr>(this TCls o, bool inherit = false) =>
+            typeof(TCls).GetCustomAttributes(inherit).OfType<TAttr>().ToArray();
+        public static TAttr[] GetCustomAttributes<TAttr>(this Type t, bool inherit = false) where TAttr:Attribute=>
+            t.GetCustomAttributes(inherit).OfType<TAttr>().ToArray();
+
         private static Dictionary<Type, Func<object, string>> _stringFuncs;
 
         static ReflectionExtensions()
