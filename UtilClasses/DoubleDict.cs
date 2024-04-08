@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UtilClasses.Extensions.Dictionaries;
+using UtilClasses.Extensions.Enumerables;
 
 namespace UtilClasses;
 
@@ -44,6 +45,23 @@ public class DoubleDict<T1, T2> : IDoubleDict<T1, T2> where T1 : IComparable
         _reverse[b] = a;
         return this;
     } 
+    public IDoubleDict<T1,T2> Insert((T1 a, T2 b) t)
+    {
+        _forward[t.a] = t.b;
+        _reverse[t.b] = t.a;
+        return this;
+    } 
+    public IDoubleDict<T1,T2> Insert(IEnumerable<(T1 a, T2 b)> ts)
+    {
+        ts.ForEach(Insert);
+        return this;
+    } 
+    public IDoubleDict<T1,T2> Insert<TObj>(IEnumerable<TObj> lst, Func<TObj, T1>  a, Func<TObj, T2> b)
+    {
+        foreach (var m in lst)
+            Insert(a(m), b(m));
+        return this;
+    }
     public T1 GetOrAdd(T2 val, Func<T1> f) => _reverse.GetOrAdd(val, f);
     public T2 GetOrAdd(T1 val, Func<T2> f) => _forward.GetOrAdd(val, f);
     public bool TryGetValue(T1 val, out T2 ret ) => _forward.TryGetValue(val, out ret);

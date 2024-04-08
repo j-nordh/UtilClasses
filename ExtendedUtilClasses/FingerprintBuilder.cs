@@ -55,6 +55,9 @@ public class FingerprintBuilder<T>
     public FingerprintBuilder<T> Add(Expression<Func<T, long>> me) => AddToString(me);
     public FingerprintBuilder<T> AddNullable(Expression<Func<T, long?>> me) => AddToString(me);
 
+    public FingerprintBuilder<T> Add_Nullable<TVal>(Expression<Func<T, TVal?>> me, Func<TVal?, string> f) =>
+        Add(me, o => o == null ? "" : f(o));
+
     public FingerprintBuilder<T> Add(Expression<Func<T, float>> me) =>
         Add(me, f => f.ToString(CultureInfo.InvariantCulture));
 
@@ -105,6 +108,14 @@ public class FingerprintBuilder<T>
 
     public FingerprintBuilder<T> Add(Expression<Func<T, bool>> me) =>
         Add(me, s => s ? "true" : "false");
+
+    public FingerprintBuilder<T> Add_Nullable(Expression<Func<T, bool?>> me) =>
+        Add(me, s => s switch
+        {
+            null => "",
+            true => "true",
+            false => "false"
+        });
 
     public FingerprintBuilder<T> Add(Expression<Func<T, Guid>> me) => AddToString(me);
     public FingerprintBuilder<T> Add_Nullable(Expression<Func<T, Guid?>> me) => AddToString(me);

@@ -17,7 +17,6 @@ public interface IAsyncRRepository<in TKey, T>
 {
     Task<List<T>> Get();
     Task<T?> Get(TKey id);
-    Task Refresh();
 }
 
 public interface ICruRepository< TKey, T> : IRRepository<TKey, T>

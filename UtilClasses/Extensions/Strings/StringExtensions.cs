@@ -302,13 +302,13 @@ namespace UtilClasses.Extensions.Strings
         public static string RemoveEndOic(this string s, string end) =>
             s.EndsWithOic(end) ? s.Substring(0, s.Length - end.Length) : s;
 
-        public static bool EqualsIc2(this string s, string value)
+        public static bool EqualsIc2(this string? s, string? value)
         {
             if (null == s) return value == null;
             return s.Equals(value, StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public static bool EqualsOic(this string s, string value)
+        public static bool EqualsOic(this string? s, string? value)
         {
             if (null == s) return value == null;
             return s.Equals(value, StringComparison.OrdinalIgnoreCase);
