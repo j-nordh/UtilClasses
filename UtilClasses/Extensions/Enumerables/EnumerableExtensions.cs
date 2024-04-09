@@ -17,7 +17,7 @@ namespace UtilClasses.Extensions.Enumerables
     public static class EnumerableExtensions
     {
         [ContractAnnotation("enumerable:null => true")]
-        public static bool IsNullOrEmpty<T>(this IEnumerable<T> enumerable)
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T>? enumerable)
         {
             return null == enumerable || !enumerable.Any();
         }

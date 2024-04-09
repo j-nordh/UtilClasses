@@ -53,11 +53,8 @@ namespace UtilClasses.Extensions.Strings
         /// <param name="value">The string to test.</param>
         /// <returns>true if the value parameter is null or an empty string (""); otherwise, false.</returns>
         [ContractAnnotation("value:null => true")]
-        public static bool IsNullOrEmpty(this string? value)
-        {
-            return string.IsNullOrEmpty(value);
-        }
-
+        public static bool IsNullOrEmpty(this string? value) => string.IsNullOrEmpty(value);
+        
         /// <summary>
         /// A nicer way of calling the inverse of <see cref="System.String.IsNullOrEmpty(string)"/>
         /// </summary>
