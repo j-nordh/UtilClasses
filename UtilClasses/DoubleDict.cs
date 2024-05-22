@@ -62,11 +62,32 @@ public class DoubleDict<T1, T2> : IDoubleDict<T1, T2> where T1 : IComparable
             Insert(a(m), b(m));
         return this;
     }
+
+    public bool Remove(T1 val)
+    {
+        if (!TryGetValue(val, out var other))
+            return false;
+        _forward.Remove(val);
+        _reverse.Remove(other);
+        return true;
+    }
+    public bool Remove(T2 val)
+    {
+        if (!TryGetValue(val, out var other))
+            return false;
+        _forward.Remove(other);
+        _reverse.Remove(val);
+        return true;
+    }
     public T1 GetOrAdd(T2 val, Func<T1> f) => _reverse.GetOrAdd(val, f);
     public T2 GetOrAdd(T1 val, Func<T2> f) => _forward.GetOrAdd(val, f);
-    public bool TryGetValue(T1 val, out T2 ret ) => _forward.TryGetValue(val, out ret);
-    public bool TryGetValue(T2 val, out T1 ret ) => _reverse.TryGetValue(val, out ret);
-    
+    public bool TryGetValue(T1 val, out T2? ret ) => _forward.TryGetValue(val, out ret);
+
+    public bool TryGetValue(T2 val, out T1? ret )
+    {
+        ret = default;
+        return null != val && _reverse.TryGetValue(val, out ret);
+    }
 }
 
 public static class DoubleDictExtensions

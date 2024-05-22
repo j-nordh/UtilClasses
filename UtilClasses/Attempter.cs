@@ -4,17 +4,43 @@ using System.Threading.Tasks;
 
 namespace UtilClasses
 {
+    public static class Try
+    {
+        public static void To(bool predicate, Action a, Action<Exception>? onException, Action? onFinally = null)
+        {
+            if (predicate) return;
+            To(a, onException, onFinally);
+        }
+
+        public static void To(Action a, Action<Exception>? onException, Action? onFinally = null)
+        {
+            try
+            {
+                a();
+            }
+            catch (Exception e)
+            {
+                onException?.Invoke(e);
+            }
+            finally
+            {
+                onFinally?.Invoke();
+            }
+        }
+    }
+
     public class Attempter
     {
         public bool IsFaulted { get; private set; }
-        public event Action<Exception, string> CaughtException;
+        public event Action<Exception, string>? CaughtException;
 
         public void Do(bool gate, Action a, string when)
         {
             if (!gate) return;
             Do(a, when);
         }
-        public void Do(Action a, string when) => Do(()=> 
+
+        public void Do(Action a, string when) => Do(() =>
         {
             a();
             return true;
@@ -31,16 +57,17 @@ namespace UtilClasses
             try
             {
                 if (IsFaulted) return;
-                var sb= new StringBuilder();
+                var sb = new StringBuilder();
                 if (f(sb)) return;
             }
             catch (Exception e)
             {
                 HandleException(e, when);
-            }   
+            }
         }
 
         public void Do(Func<Task<bool>> f, string when) => Do(() => Task.Run(f).Result, when);
+
         public void Do(Func<bool> f, string when)
         {
             try
@@ -51,7 +78,7 @@ namespace UtilClasses
             }
             catch (Exception ex)
             {
-               HandleException(ex, when);
+                HandleException(ex, when);
             }
         }
 
@@ -59,7 +86,6 @@ namespace UtilClasses
         {
             IsFaulted = true;
             CaughtException?.Invoke(ex, when);
-
         }
     }
 }

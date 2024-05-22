@@ -12,6 +12,7 @@ using UtilClasses.Extensions.Enumerables;
 using UtilClasses.Extensions.Exceptions;
 using UtilClasses.Extensions.Objects;
 using UtilClasses.Extensions.Strings;
+using UtilClasses.Extensions.Types;
 
 namespace UtilClasses.Extensions.Reflections
 {
@@ -73,11 +74,13 @@ namespace UtilClasses.Extensions.Reflections
             mi.GetCustomAttributes(typeof(T), inherit).Any();
         public static bool HasCustomAttribute(this MethodInfo mi, Type t, bool inherit = false) =>
             mi.GetCustomAttributes(t, inherit).Any();
-
-        public static object[] GetCustomAttributes<TCls>(this TCls o, bool inherit = false) =>
-            typeof(TCls).GetCustomAttributes(true);
-        public static TAttr[] GetCustomAttributes<TCls, TAttr>(this TCls o, bool inherit = false) =>
+        
+        public static TAttr[] GetCustomAttributes<TCls, TAttr>(this TCls _, bool inherit = false) =>
             typeof(TCls).GetCustomAttributes(inherit).OfType<TAttr>().ToArray();
+        public static Attribute[] GetCustomAttributes<TCls>(this TCls _, string name,bool inherit = false) =>
+            typeof(TCls).GetCustomAttributes(inherit).Where(a=>a.GetType().SaneName().ContainsOic(name)).OfType<Attribute>().ToArray();
+        public static T[] GetPropCustomAttributes<T>(this PropertyInfo pi, bool inherit = false) =>
+            pi.GetCustomAttributes(inherit).OfType<T>().ToArray();
         public static TAttr[] GetCustomAttributes<TAttr>(this Type t, bool inherit = false) where TAttr:Attribute=>
             t.GetCustomAttributes(inherit).OfType<TAttr>().ToArray();
 

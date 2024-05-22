@@ -32,7 +32,7 @@ namespace UtilClasses.Extensions.Expressions
             }
         }
 
-        public static Action<TEntity, TProperty> CreateSetter<TEntity, TProperty>( this
+        public static Action<TEntity, TProperty> CreateSetter<TEntity, TProperty>(this
             Expression<Func<TEntity, TProperty>> property)
         {
             PropertyInfo propertyInfo = GetProperty(property);
@@ -59,7 +59,7 @@ namespace UtilClasses.Extensions.Expressions
             return property;
         }
 
-        private static MemberExpression GetMemberExpression<TEntity, TProperty>(this 
+        private static MemberExpression GetMemberExpression<TEntity, TProperty>(this
             Expression<Func<TEntity, TProperty>> expression)
         {
             MemberExpression memberExpression = null;
@@ -80,6 +80,9 @@ namespace UtilClasses.Extensions.Expressions
 
             return memberExpression;
         }
+
+        public static string GetName<T, TVal>(this Expression<Func<T, TVal>> m) =>
+            m.Body.MemberName() ?? m.Name ?? "Unknown";
 
         public static Func<TEntity, TProperty> CreateGetter<TEntity, TProperty>(
             this Expression<Func<TEntity, TProperty>> property)
@@ -104,7 +107,7 @@ namespace UtilClasses.Extensions.Expressions
                     throw new ArgumentNullException(nameof(e), @"That's not even a lambda expression!");
                 //try casting it directly as a MemberExpression
                 me = lambda.Body as MemberExpression;
-                
+
                 //special case we _can_ support but probably don't use
                 if (lambda.Body.NodeType == ExpressionType.Convert)
                     me = ((UnaryExpression)lambda.Body).Operand as MemberExpression;

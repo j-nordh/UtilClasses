@@ -61,16 +61,16 @@ namespace UtilClasses.Extensions.Strings
         /// <param name="value">The string to test.</param>
         /// <returns>true if the value parameter is not null or an empty string (""); otherwise, false.</returns>
         [ContractAnnotation("value:null=>false")]
-        public static bool IsNotNullOrEmpty(this string value) => !value.IsNullOrEmpty();
+        public static bool IsNotNullOrEmpty(this string? value) => !value.IsNullOrEmpty();
 
-        public static bool IsNotNullOrWhitespace(this string s) => !s.IsNullOrWhitespace();
+        public static bool IsNotNullOrWhitespace(this string? s) => !s.IsNullOrWhitespace();
 
         public static bool IsEmpty(this string value)
         {
             return value.Equals(string.Empty);
         }
 
-        public static bool IsNullOrWhitespace(this string s)
+        public static bool IsNullOrWhitespace(this string? s)
         {
             return string.IsNullOrWhiteSpace(s);
         }
@@ -329,11 +329,11 @@ namespace UtilClasses.Extensions.Strings
             return s.Equals(value, StringComparison.OrdinalIgnoreCase);
         }
 
-        public static bool EqualsAnyOic(this string s, IEnumerable<string> vals) =>
+        public static bool EqualsAnyOic(this string? s, IEnumerable<string> vals) =>
             vals?.Any(s.EqualsOic) ?? false;
 
 
-        public static bool EqualsAnyOic(this string s, params string[] vals) => s.EqualsAnyOic(vals.AsEnumerable());
+        public static bool EqualsAnyOic(this string? s, params string[] vals) => s.EqualsAnyOic(vals.AsEnumerable());
 
         [Obsolete("Use EqualsAnyOic instead")]
         public static bool InOic(this string s, IEnumerable<string> vals) =>
@@ -341,7 +341,7 @@ namespace UtilClasses.Extensions.Strings
 
 
         [Obsolete("Use EqualsAnyOic instead")]
-        public static bool InOic(this string s, params string[] vals) => s.EqualsAnyOic(vals.AsEnumerable());
+        public static bool InOic(this string? s, params string[] vals) => s.EqualsAnyOic(vals.AsEnumerable());
 
         public static bool AsBoolean(this string? s)
         {
@@ -523,11 +523,13 @@ namespace UtilClasses.Extensions.Strings
             return index < 0 ? str : str.Substring(0, index);
         }
 
+        public static string SubstringBetweenQuotes(this string str,
+            StringComparison sc = StringComparison.OrdinalIgnoreCase) => str.SubstringBetween("\"", "\"", sc);
         public static string SubstringBetween(this string str, string before, string after,
             StringComparison sc = StringComparison.OrdinalIgnoreCase)
         {
             var start = str.IndexOf(before, sc);
-            var end = str.IndexOf(after, sc);
+            var end = str.IndexOf(after, start+1, sc);
             if (start == -1) throw new ArgumentException("Could not find \"before\" marker");
             if (end == -1) throw new ArgumentException("Could not find \"after\" marker");
 

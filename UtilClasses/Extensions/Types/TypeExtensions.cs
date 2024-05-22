@@ -4,7 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using UtilClasses.Extensions.Dictionaries;
+using UtilClasses.Extensions.Integers;
 using UtilClasses.Extensions.Strings;
+using UtilClasses.Interfaces;
 
 namespace UtilClasses.Extensions.Types
 {
@@ -35,19 +37,45 @@ namespace UtilClasses.Extensions.Types
         }
 
         public static string SaneName(this Type t) => t.SaneName(false);
+
         public static string SaneName(this Type t, bool withNamespace)
         {
             var ns = withNamespace
                 ? t.Namespace + "."
                 : "";
             if (t.Name.StartsWithOic("Task"))
-                return t.GenericTypeArguments.Any() 
-                    ? ns + SaneName(t.GenericTypeArguments.First(), withNamespace) 
+                return t.GenericTypeArguments.Any()
+                    ? ns + SaneName(t.GenericTypeArguments.First(), withNamespace)
                     : "void";
             return !t.IsGenericType
                 ? ns + MapTypeName(t.Name)
                 : $"{ns}{t.Name.Substring(0, t.Name.Length - 2)}<{SaneName(t.GetGenericArguments().First())}>";
         }
+
+        public static string ToSaneName(this string str, bool withNamespace)
+        {
+            var generic = str.ContainsOic("`")
+                ? str.SubstringAfter("`")
+                : "";
+            if (generic.IsNotNullOrEmpty())
+            {
+                var parts = generic.SubstringAfter("[").SubstringBeforeLast("]").SplitREE("],[")
+                    .Select(s => s.Trim('[', ']').SubstringBefore(",").SimplifyTypeName()).ToList();
+                generic = $"<{parts.Join(", ")}>";
+            }
+
+            var name = str.SubstringBefore("`").SubstringAfterLast(".");
+            var ns = withNamespace ? str.SubstringBeforeLast(".") + "." : "";
+            return $"{ns}{name}{generic}";
+        }
+
+        public static string SimplifyTypeName(this string s)
+            => s
+                .Replace("System.Int32", "int")
+                .Replace("System.String", "string")
+                .Replace("System.Int16", "short")
+                .Replace("System.Boolean", "bool")
+                .Replace("System.Int64", "long");
 
         public static Type AsNullable(this Type t, bool nullable = true)
         {
@@ -76,7 +104,9 @@ namespace UtilClasses.Extensions.Types
             {
             }
 
-            public PropFieldInformation(FieldInfo fi) : this(fi.Name, fi.FieldType) { }
+            public PropFieldInformation(FieldInfo fi) : this(fi.Name, fi.FieldType)
+            {
+            }
 
             public string Name { get; }
             public System.Type ValueType { get; }
@@ -98,8 +128,11 @@ namespace UtilClasses.Extensions.Types
         public static bool CanBe<T>(this Type t) => typeof(T).IsAssignableFrom(t);
         public static bool CanBe(this Type t, Type other) => other.IsAssignableFrom(t);
 
-        public static IEnumerable<Type> Implementing(this IEnumerable<Type> ts, string ifaceName) => ts.Where(t => t.GetInterfaces().Any(i => i.Name.SubstringBefore("`").EqualsOic(ifaceName)));
-        public static IEnumerable<Type> Implementing<T>(this IEnumerable<Type> ts) => ts.Where(t => t.GetInterfaces().Any(i => i.Name.SubstringBefore("`").EqualsOic(typeof(T).Name)));
+        public static IEnumerable<Type> Implementing(this IEnumerable<Type> ts, string ifaceName) => ts.Where(t =>
+            t.GetInterfaces().Any(i => i.Name.SubstringBefore("`").EqualsOic(ifaceName)));
+
+        public static IEnumerable<Type> Implementing<T>(this IEnumerable<Type> ts) => ts.Where(t =>
+            t.GetInterfaces().Any(i => i.Name.SubstringBefore("`").EqualsOic(typeof(T).Name)));
 
         public static Func<TIn, TOut> GenerateConstructor<TIn, TOut>(this Type ot)
         {
@@ -110,6 +143,7 @@ namespace UtilClasses.Extensions.Types
             LambdaExpression lambda = Expression.Lambda<Func<TIn, TOut>>(exp, arg);
             return (Func<TIn, TOut>)lambda.Compile();
         }
+
         public static Func<T1, T2, TOut> GenerateConstructor<T1, T2, TOut>(this Type ot)
         {
             var arg1 = Expression.Parameter(typeof(T1), "p1");
@@ -120,6 +154,7 @@ namespace UtilClasses.Extensions.Types
             LambdaExpression lambda = Expression.Lambda<Func<T1, T2, TOut>>(exp, arg1, arg2);
             return (Func<T1, T2, TOut>)lambda.Compile();
         }
+
         public static Func<T1, T2, T3, TOut> GenerateConstructor<T1, T2, T3, TOut>(this Type ot)
         {
             var arg1 = Expression.Parameter(typeof(T1), "p1");
@@ -131,6 +166,7 @@ namespace UtilClasses.Extensions.Types
             LambdaExpression lambda = Expression.Lambda<Func<T1, T2, T3, TOut>>(exp, arg1, arg2, arg3);
             return (Func<T1, T2, T3, TOut>)lambda.Compile();
         }
+
         public static Func<T1, T2, T3, T4, TOut> GenerateConstructor<T1, T2, T3, T4, TOut>(this Type ot)
         {
             var arg1 = Expression.Parameter(typeof(T1), "p1");
@@ -143,6 +179,7 @@ namespace UtilClasses.Extensions.Types
             LambdaExpression lambda = Expression.Lambda<Func<T1, T2, T3, T4, TOut>>(exp, arg1, arg2, arg3, arg4);
             return (Func<T1, T2, T3, T4, TOut>)lambda.Compile();
         }
+
         public static Func<TOut> GenerateConstructor<TOut>(this Type ot)
         {
             var ctor = ot.GetConstructor(new Type[] { });
@@ -153,7 +190,8 @@ namespace UtilClasses.Extensions.Types
         }
 
 
-        public static List<Accessor<TObj, T>>? GetPropAccessors<TObj, T>(this TObj obj, Func<PropertyInfo, bool>? predicate = null)
+        public static List<Accessor<TObj, T>>? GetPropAccessors<TObj, T>(this TObj obj,
+            Func<PropertyInfo, bool>? predicate = null)
         {
             predicate ??= x => true;
             if (null == obj)
@@ -165,7 +203,8 @@ namespace UtilClasses.Extensions.Types
                 .ToList();
         }
 
-        public static List<Accessor<TObj, bool>> GetFlagAccessors<TObj>(this TObj obj, Func<PropertyInfo, bool>? predicate = null) => obj.GetPropAccessors<TObj, bool>(predicate);
+        public static List<Accessor<TObj, bool>> GetFlagAccessors<TObj>(this TObj obj,
+            Func<PropertyInfo, bool>? predicate = null) => obj.GetPropAccessors<TObj, bool>(predicate);
 
 
         public static IEnumerable<Type> RequireInterface<TInterface>(this IEnumerable<Type> types) => types.Where(t =>
@@ -177,10 +216,14 @@ namespace UtilClasses.Extensions.Types
         public static IEnumerable<Type> RequireNew(this IEnumerable<Type> types) =>
             types.Where(t => t.GetConstructors().Any(c => c.GetParameters().Length == 0));
 
-        public static IEnumerable<Type> RequireConstructor(this IEnumerable<Type> types, params Type[] parameters) => types.Where(t => t.HasConstructor(parameters));
+        public static IEnumerable<Type> RequireConstructor(this IEnumerable<Type> types, params Type[] parameters) =>
+            types.Where(t => t.HasConstructor(parameters));
 
-        public static IEnumerable<Type> RequireConstructor<T1>(this IEnumerable<Type> types) => types.RequireConstructor(typeof(T1));
-        public static IEnumerable<Type> RequireConstructor<T1, T2>(this IEnumerable<Type> types) => types.RequireConstructor(typeof(T1), typeof(T2));
+        public static IEnumerable<Type> RequireConstructor<T1>(this IEnumerable<Type> types) =>
+            types.RequireConstructor(typeof(T1));
+
+        public static IEnumerable<Type> RequireConstructor<T1, T2>(this IEnumerable<Type> types) =>
+            types.RequireConstructor(typeof(T1), typeof(T2));
 
         public static IEnumerable<T> Activate<T>(this IEnumerable<Type> types) =>
             types
@@ -192,9 +235,15 @@ namespace UtilClasses.Extensions.Types
 
         public static bool HasConstructor<T>(this Type type) => type.HasConstructor(typeof(T));
         public static bool HasConstructor<T, T1>(this Type type) => type.HasConstructor(typeof(T), typeof(T1));
-        public static bool HasConstructor<T, T1, T2>(this Type type) => type.HasConstructor(typeof(T), typeof(T1), typeof(T2));
-        public static bool HasConstructor<T, T1, T2, T3>(this Type type) => type.HasConstructor(typeof(T), typeof(T1), typeof(T2), typeof(T3));
-        public static bool HasConstructor<T, T1, T2, T3, T4>(this Type type) => type.HasConstructor(typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
+
+        public static bool HasConstructor<T, T1, T2>(this Type type) =>
+            type.HasConstructor(typeof(T), typeof(T1), typeof(T2));
+
+        public static bool HasConstructor<T, T1, T2, T3>(this Type type) =>
+            type.HasConstructor(typeof(T), typeof(T1), typeof(T2), typeof(T3));
+
+        public static bool HasConstructor<T, T1, T2, T3, T4>(this Type type) =>
+            type.HasConstructor(typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
 
         public static bool HasConstructor(this Type type, params Type[] ps)
         {
@@ -209,24 +258,31 @@ namespace UtilClasses.Extensions.Types
                     ok = false;
                     break;
                 }
+
                 if (!ok) continue;
                 return true;
             }
+
             return false;
         }
 
-        public static IEnumerable<PropertyInfo> WhereNullable(this IEnumerable<PropertyInfo> pis) => pis.Where(pi => pi.PropertyType.IsNullable());
-        public static IEnumerable<Accessor<T, object>> GetAccessors<T>(this IEnumerable<PropertyInfo> pis) => pis.Select(x => Accessor.FromPropInfo<T, object>(x));
+        public static IEnumerable<PropertyInfo> WhereNullable(this IEnumerable<PropertyInfo> pis) =>
+            pis.Where(pi => pi.PropertyType.IsNullable());
+
+        public static IEnumerable<Accessor<T, object>> GetAccessors<T>(this IEnumerable<PropertyInfo> pis) =>
+            pis.Select(x => Accessor.FromPropInfo<T, object>(x));
+
         private static readonly IDictionary<string, string?> _typeMapping = new DictionaryOic<string?>()
         {
-            {"String","string"},
-            {"Int","int"},
-            {"Int32","int"},
-            {"Int64","long"},
-            {"Void",null},
-            {"Single", "float" },
-            {"Boolean", "bool" }
+            { "String", "string" },
+            { "Int", "int" },
+            { "Int32", "int" },
+            { "Int64", "long" },
+            { "Void", null },
+            { "Single", "float" },
+            { "Boolean", "bool" }
         };
+
         public static string? MapTypeName(this string typeName) =>
             null == typeName
                 ? null
