@@ -26,12 +26,14 @@ namespace UtilClasses.Services
             //let's use AppSettings, allow for DEBUG, RELEASE and Production versions and make environment variables accessible.
             builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile(
-                    $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
-                    optional: true)
+#if DEBUG
+                .AddJsonFile("appsettings.Development.json", optional: true)
+#else
+                .AddJsonFile("appsettings.Production.json", optional: true)
+#endif
                 .AddEnvironmentVariables();
         }
-        
+
         public static void SetupLogging(WebApplicationBuilder builder, string logDir,
             Action<LoggerConfiguration>? setup = null)
         {

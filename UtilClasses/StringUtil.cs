@@ -18,6 +18,7 @@ namespace UtilClasses
                 sb.Append(trim ? part.Trim(separator) : part);
                 sb.Append(separator);
             }
+
             return sb.ToString();
         }
 
@@ -32,8 +33,8 @@ namespace UtilClasses
             EndsWith("ues", 1);
             EndsWith("ses", 2);
             EndsWith("xes", 2);
-            EndsWith("s", Trim(1));
-
+            EndsWith("ess", 0);
+            EndsWith("s", (1));
         }
 
         private static void EndsWith(string ending, Func<string, string> f)
@@ -44,6 +45,7 @@ namespace UtilClasses
         private static void EndsWith(string ending, int i) => EndsWith(ending, Trim(i));
 
         private static Func<string, string> Trim(int i) => s => s.Substring(0, s.Length - i);
+
         public static string ToSingle(string plural)
         {
             if (plural.StartsWith("tbl"))
@@ -63,11 +65,16 @@ namespace UtilClasses
             if (plural.EndsWithAnyOic("ays", "oys")) return plural;
             if (plural.EndsWithOic("ys"))
                 plural = plural.Substring(0, plural.Length - 2) + "ies";
+            if (plural.EndsWithIc2("sss"))
+                plural = plural.Substring(0, plural.Length - 1);
+            if (plural.EndsWithOic("ss"))
+                plural += "es";
             return plural;
         }
 
         public static (string, string) FixPluralization(string a, string b) =>
             (FixPluralization(a), FixPluralization(b));
+
         public static (string, string, string) FixPluralization(string a, string b, string c) =>
             (FixPluralization(a), FixPluralization(b), FixPluralization(c));
 
@@ -79,11 +86,13 @@ namespace UtilClasses
                 return s.Substring(1);
             return s;
         }
+
         public static string PadCenter(string a, string b, int totalLength)
         {
             var spaces = new string(' ', totalLength - a.Length - b.Length);
             return $"{a}{spaces}{b}";
         }
+
         public static string SnakeToCamel(string s)
         {
             if (s.Any(char.IsUpper))
@@ -96,14 +105,16 @@ namespace UtilClasses
             bool nextUpper = false;
             foreach (var c in s.Skip(1))
             {
-                if(c == '_') { 
+                if (c == '_')
+                {
                     nextUpper = true;
                     continue;
                 }
-                
-                b.Append(nextUpper? char.ToUpper(c) : c);
+
+                b.Append(nextUpper ? char.ToUpper(c) : c);
                 nextUpper = false;
             }
+
             return b.ToString();
         }
     }

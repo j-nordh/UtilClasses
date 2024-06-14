@@ -57,6 +57,21 @@ namespace UtilClasses.MathClasses
 
             return value;
         }
+        public static float WrapAround(float value, float min,float max)
+        {
+            if (value >= min && value <= max)
+                return value;
+            var r = max - min;
+            while (value < min)
+            {
+                value += r;
+            }
+            while (value > max)
+            {
+                value -= r;
+            }
 
+            return value;
+        }
     }
 }

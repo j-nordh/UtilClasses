@@ -8,8 +8,8 @@ namespace UtilClasses.Extensions.Doubles
         public static double Abs(this double d) => Math.Abs(d);
         public static decimal AsDecimal(this double d) => (decimal)d;
         public static decimal AsDecimal(this float d) => (decimal)d;
-        public static bool Near(this double d, double o, double limit = 0.0001) => Math.Abs(d - o) < limit;
-        public static bool Near(this float d, float o, float limit = 0.0001f) => Math.Abs(d - o) < limit;
+        public static bool IsNear(this double d, double o, double limit = 0.0001) => Math.Abs(d - o) < limit;
+        public static bool IsNear(this float d, float o, float limit = 0.0001f) => Math.Abs(d - o) < limit;
         public static double AsDouble(this object o) => o is double d ? d : o.ToString().AsDouble();
         public static double AsDouble(this string s) => double.Parse(s.Replace('.', ','), NumberStyles.Any, CultureInfo.GetCultureInfo("SV-se"));
         public static bool IsDouble(this string s) => s.IsDouble(out _);

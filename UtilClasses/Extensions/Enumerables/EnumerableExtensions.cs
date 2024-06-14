@@ -158,7 +158,7 @@ namespace UtilClasses.Extensions.Enumerables
             elems.Where(e => e != null).Select(e=>e!);
 
         public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> elems) where T : struct =>
-            elems.Where(e => e.HasValue).Select(e => e.Value);
+            elems.Where(e => e.HasValue).Select(e => e!.Value);
 
         public static IEnumerable<(TKey, TVal)> NotNull<TKey, TVal>(this IEnumerable<(TKey? K, TVal V)> items)
             where TKey : struct => items.Where(t => t.K != null).Select(t => (t.K.Value, t.V));

@@ -300,6 +300,9 @@ namespace UtilClasses.Extensions.Tasks
             }
             return ret;
         }
+
+        public static async Task<IEnumerable<TOut>> Cast<TIn, TOut>(this Task<IEnumerable<TIn>> os) =>
+            (await os).Cast<TOut>(); 
         #endregion
         public static T RunAndGet<T>(this Task<T> t) where T : class
         {
@@ -307,5 +310,6 @@ namespace UtilClasses.Extensions.Tasks
             Task.Run(async () => tcs.SetResult(await t)).ContinueWith(task => { if (task.IsFaulted) tcs.SetException(task.Exception); });
             return tcs.Task.Result;
         }
+        
     }
 }

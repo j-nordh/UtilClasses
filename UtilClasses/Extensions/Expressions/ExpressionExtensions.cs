@@ -40,7 +40,8 @@ namespace UtilClasses.Extensions.Expressions
             ParameterExpression instance = Expression.Parameter(typeof(TEntity), "instance");
             ParameterExpression parameter = Expression.Parameter(typeof(TProperty), "param");
 
-            var body = Expression.Call(instance, propertyInfo.GetSetMethod(), parameter);
+            var setMethod = propertyInfo.GetSetMethod();
+            var body = Expression.Call(instance, setMethod, parameter);
             var parameters = new ParameterExpression[] { instance, parameter };
 
             return Expression.Lambda<Action<TEntity, TProperty>>(body, parameters).Compile();

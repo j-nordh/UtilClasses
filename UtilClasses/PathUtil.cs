@@ -49,7 +49,7 @@ namespace UtilClasses
             var relativeUri = baseUri.MakeRelativeUri(fullUri);
 
             // Uri's use forward slashes so convert to the preferred separator.
-            return relativeUri.ToString().Replace('/', Path.PathSeparator);
+            return relativeUri.ToString().Replace('/', Path.DirectorySeparatorChar);
         }
 
         public static string GetAbsolutePath(string relPath, string? basePath = null)

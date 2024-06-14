@@ -54,7 +54,7 @@ namespace UtilClasses.Extensions.Strings
         /// <returns>true if the value parameter is null or an empty string (""); otherwise, false.</returns>
         [ContractAnnotation("value:null => true")]
         public static bool IsNullOrEmpty(this string? value) => string.IsNullOrEmpty(value);
-        
+
         /// <summary>
         /// A nicer way of calling the inverse of <see cref="System.String.IsNullOrEmpty(string)"/>
         /// </summary>
@@ -329,11 +329,14 @@ namespace UtilClasses.Extensions.Strings
             return s.Equals(value, StringComparison.OrdinalIgnoreCase);
         }
 
-        public static bool EqualsAnyOic(this string? s, IEnumerable<string> vals) =>
+        public static IEnumerable<string?> DistinctOic(this IEnumerable<string?> strings)
+            => strings.Distinct(StringComparer.OrdinalIgnoreCase);
+
+        public static bool EqualsAnyOic(this string? s, IEnumerable<string?> vals) =>
             vals?.Any(s.EqualsOic) ?? false;
 
 
-        public static bool EqualsAnyOic(this string? s, params string[] vals) => s.EqualsAnyOic(vals.AsEnumerable());
+        public static bool EqualsAnyOic(this string? s, params string?[] vals) => s.EqualsAnyOic(vals.AsEnumerable());
 
         [Obsolete("Use EqualsAnyOic instead")]
         public static bool InOic(this string s, IEnumerable<string> vals) =>
@@ -472,6 +475,17 @@ namespace UtilClasses.Extensions.Strings
                 removeEmptyEntries ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
         }
 
+        public static string? MaybeGetLine(this string? str, int index, bool removeEmptyEntries = false)
+        {
+            if (null == str) return str;
+            if (index < 0)
+                return null;
+            var lines = str.SplitLines(removeEmptyEntries);
+            return lines.Length > index
+                ? lines[index]
+                : null;
+        }
+
         public static IEnumerable<string> Trim(this IEnumerable<string> items) => items.Select(s => s.Trim());
 
         public static string TrimLines(this string str, string lineBreak = "\r\n") =>
@@ -525,11 +539,12 @@ namespace UtilClasses.Extensions.Strings
 
         public static string SubstringBetweenQuotes(this string str,
             StringComparison sc = StringComparison.OrdinalIgnoreCase) => str.SubstringBetween("\"", "\"", sc);
+
         public static string SubstringBetween(this string str, string before, string after,
             StringComparison sc = StringComparison.OrdinalIgnoreCase)
         {
             var start = str.IndexOf(before, sc);
-            var end = str.IndexOf(after, start+1, sc);
+            var end = str.IndexOf(after, start + 1, sc);
             if (start == -1) throw new ArgumentException("Could not find \"before\" marker");
             if (end == -1) throw new ArgumentException("Could not find \"after\" marker");
 
@@ -728,8 +743,8 @@ namespace UtilClasses.Extensions.Strings
         }
 
 
-        public static string Join(this IEnumerable<string> parts, string separator) =>
-            string.Join(separator, parts.ToArray());
+        public static string? Join(this IEnumerable<string>? parts, string separator) =>
+            null == parts ? "" : string.Join(separator, parts.ToArray());
 
         public static string Join(this IEnumerable<string> parts, Func<string, string> sep)
         {

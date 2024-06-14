@@ -13,7 +13,9 @@ using UtilClasses.Extensions.Types;
 using UtilClasses.Files;
 
 namespace UtilClasses.Services.Api;
-
+#if !DEBUG
+    [ApiExplorerSettings(IgnoreApi = true)]
+#endif
 [Controller]
 [Route("[controller]")]
 public class DebugController : Controller
@@ -27,7 +29,6 @@ public class DebugController : Controller
         _serviceCollection = serviceCollection;
     }
 
-    [ApiExplorerSettings(IgnoreApi = true)]
     [HttpGet("routes")]
     public string PrintRoutes([FromQuery] bool updateFiles = false)
     {
@@ -63,14 +64,14 @@ public class DebugController : Controller
         sb.AppendLine(tree.ToString());
 
         var assemblies =
-                endpoints.Select(ep => ep.DisplayName
-                    .SubstringAfter("(")
-                    .SubstringBefore(")")
-                ).Distinct();
-        
+            endpoints.Select(ep => ep.DisplayName
+                .SubstringAfter("(")
+                .SubstringBefore(")")
+            ).Distinct();
+
         // The following code could be adapted to generate route files. But it's a bit hard to generalize,
         // hence it is commented out as a possible future improvement.
-        
+
         // var dir = new DirectoryInfo(Environment.CurrentDirectory);
         // while (!dir.GetDirectories().Any(d => d.Name.EqualsOic("MACS.Common")))
         //     dir = dir.Parent;
@@ -92,12 +93,12 @@ public class DebugController : Controller
         //         FileSaver.SaveIfChanged(Path.Combine(fileDir, $"{name}Routes.cs"), cls);
         //     }
         // }
-        
+
         return sb.ToString();
     }
 
     [HttpGet("di")]
-    public Dictionary<string, List<string>> DependecyInjectionProblems()
+    public Dictionary<string, List<string>> DependecyInjectionProblems(bool hideOk = false)
     {
         var serviceProvider = _serviceCollection.BuildServiceProvider();
         var res = new DictionaryOic<List<string>>();
@@ -114,6 +115,7 @@ public class DebugController : Controller
                 }
 
                 var _ = serviceProvider.GetService(service.ServiceType);
+                if (hideOk) continue;
                 res.GetOrAdd("Valid").Add(serviceType.ToString());
             }
             catch (Exception e)

@@ -9,4 +9,8 @@
     <Compile Remove="IChainable.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+  </ItemGroup>
+
 </Project>
