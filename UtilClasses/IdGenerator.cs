@@ -57,11 +57,23 @@ namespace UtilClasses
 
         public class UnsafeGenerator
         {
-            private readonly Random _rnd = new();
+            private readonly Random _rnd;
+
+            public UnsafeGenerator()
+            {
+                _rnd = new();
+            }
+
+            public UnsafeGenerator(int seed)
+            {
+                _rnd = new Random(seed);
+            }
 
             public string Thing() =>
                 $"{Get(Adjectives)} {Get(Nouns)}";
 
+            public string Adjective() => Get(Adjectives);
+            public string Noun() => Get(Nouns);
             public string Name() =>
                 $"{Get(FirstNames)} {Get(LastNames)}";
 
