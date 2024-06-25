@@ -4,6 +4,8 @@ using UtilClasses.Extensions.Strings;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
+using UtilClasses.Extensions.Enumerables;
 using UtilClasses.Extensions.Integers;
 using UtilClasses.Extensions.Types;
 
@@ -11,12 +13,12 @@ namespace UtilClasses.Extensions.Enums
 {
     public static class EnumExtensions
     {
-        public static bool IsSuccess(this System.Net.HttpStatusCode code) => ((int) code) >= 200 && ((int) code) <= 299;
+        public static bool IsSuccess(this System.Net.HttpStatusCode code) => ((int)code) >= 200 && ((int)code) <= 299;
 
-        public static T ParseAs<T>(this string s, bool ignoreCase=true)
+        public static T ParseAs<T>(this string s, bool ignoreCase = true)
         {
-            if(!typeof(T).IsEnum) throw new Exception($"The supplied type {typeof(T).Name} is not an Enum.");
-            return (T) Enum.Parse(typeof(T), s, ignoreCase);
+            if (!typeof(T).IsEnum) throw new Exception($"The supplied type {typeof(T).Name} is not an Enum.");
+            return (T)Enum.Parse(typeof(T), s, ignoreCase);
         }
 
         public static List<T> Values<T>()
@@ -26,7 +28,7 @@ namespace UtilClasses.Extensions.Enums
             return Enum.GetValues(typeof(T)).Cast<T>().ToList();
         }
 
-        public static T CastTo<T>(this int i) where T:IEquatable<int>
+        public static T CastTo<T>(this int i) where T : IEquatable<int>
         {
             if (!typeof(T).IsEnum)
                 throw new ArgumentException("This method can only be used with an Enum generic type parameter");
@@ -36,7 +38,7 @@ namespace UtilClasses.Extensions.Enums
             return Enum.GetValues(typeof(T)).Cast<T>().First(v => v.Equals(i));
         }
 
-        public static T AsEnum<T>(this int i, T defaultValue) where T:struct 
+        public static T AsEnum<T>(this int i, T defaultValue) where T : struct
         {
             if (!typeof(T).IsEnum)
                 throw new ArgumentException("This method can only be used with an Enum generic type parameter");
@@ -45,6 +47,7 @@ namespace UtilClasses.Extensions.Enums
                 return defaultValue;
             return (T)(object)i;
         }
+
         public static T? AsEnum<T>(this int i, T? defaultValue) where T : struct
         {
             if (!typeof(T).IsEnum)
@@ -55,12 +58,13 @@ namespace UtilClasses.Extensions.Enums
             return (T)(object)i;
         }
 
-        public static T? AsEnum<T>(this object o, T? defaultValue) where T : struct, Enum, IConvertible, IComparable => Enum<T>.TryParse(o) ?? defaultValue;
+        public static T? AsEnum<T>(this object o, T? defaultValue) where T : struct, Enum, IConvertible, IComparable =>
+            Enum<T>.TryParse(o) ?? defaultValue;
 
         public static T AsEnum<T>(this object o) where T : struct, Enum, IConvertible, IComparable
         {
             var ret = Enum<T>.TryParse(o);
-            if(null == ret) throw new Exception($"Could not parse {o} into a {typeof(T).Name}");
+            if (null == ret) throw new Exception($"Could not parse {o} into a {typeof(T).Name}");
             return ret.Value;
         }
 
@@ -71,20 +75,21 @@ namespace UtilClasses.Extensions.Enums
             where T : struct, IComparable
         {
             var set = new HashSet<T>(needles);
-            return hay.Where(h=>set.Contains(f(h)));
+            return hay.Where(h => set.Contains(f(h)));
         }
 
-        public static TA? GetEnumAttribute<TA>(this object e) where TA:class=>
+        public static TA? GetEnumAttribute<TA>(this object e) where TA : class =>
             e.GetType().GetMember(e.ToString())
                 .FirstOrDefault()?
                 .GetCustomAttributes(false)
                 .OfType<TA>()
                 .FirstOrDefault();
 
-        public static string? GetKey<T>(this T e) where T:Enum => e.GetEnumAttribute<KeyAttribute>()?.Key;
-        public static string GetKeyOrName<T>(this T e) where T : Enum => e.GetKey() ?? e.ToString();
-        public static bool In<T>(this T needle, params T[] es) where T : Enum => es.Any(e=>e.Equals(needle));
+        public static string? GetKey<T>(this T e) where T : Enum => e.GetEnumAttribute<KeyAttribute>()?.Key
+                                                                    ?? e.GetEnumAttribute<EnumMemberAttribute>()?.Value;
 
+        public static string GetKeyOrName<T>(this T e) where T : Enum => e.GetKey() ?? e.ToString();
+        public static bool In<T>(this T needle, params T[] es) where T : Enum => es.Any(e => e.Equals(needle));
     }
 
     public class Enum<T> where T : struct, Enum, IConvertible, IComparable
@@ -96,13 +101,14 @@ namespace UtilClasses.Extensions.Enums
                 RequireEnum();
                 return Enum.GetValues(typeof(T)).Cast<T>().ToList();
             }
-            
         }
+
         private static void RequireEnum()
         {
             if (!typeof(T).IsEnum)
                 throw new ArgumentException("This method can only be used with an Enum generic type parameter");
         }
+
         public static List<string> Names
         {
             get
@@ -111,6 +117,7 @@ namespace UtilClasses.Extensions.Enums
                 return Enum.GetValues(typeof(T)).Cast<T>().Select(e => e.ToString()).ToList();
             }
         }
+
         public static int Count
         {
             get
@@ -120,7 +127,7 @@ namespace UtilClasses.Extensions.Enums
             }
         }
 
-        public static bool Is(T e, params T[] needles) => needles.Any(n=>e.CompareTo(n)==0);
+        public static bool Is(T e, params T[] needles) => needles.Any(n => e.CompareTo(n) == 0);
 
         public static IEnumerable<string> DescOrNames => Values.Select(DescriptionOrName);
 
@@ -129,9 +136,10 @@ namespace UtilClasses.Extensions.Enums
             RequireEnum();
             var memInfo = typeof(T).GetMember(v.ToString());
             var a = memInfo[0].GetFirstCustomAttribute<DescriptionAttribute>();
-            return null ==a? v.ToString(): a.Description;
+            return null == a ? v.ToString() : a.Description;
         }
-        public static T Cast(int i, T defaultValue) 
+
+        public static T Cast(int i, T defaultValue)
         {
             RequireEnum();
 
@@ -139,6 +147,7 @@ namespace UtilClasses.Extensions.Enums
                 return defaultValue;
             return (T)(object)i;
         }
+
         public static T Cast(int i)
         {
             RequireEnum();
@@ -147,32 +156,51 @@ namespace UtilClasses.Extensions.Enums
                 throw new ArgumentOutOfRangeException($"{i} cannot be converted to a {typeof(T).Name}");
             return (T)(object)i;
         }
-        public static IEnumerable<T> WithAttribute<TA>(Func<TA?, bool> pred) where TA : Attribute => Values.Where(e => pred(e.GetEnumAttribute<TA>()));
-        public static IEnumerable<T> WithAttribute<TA>() where TA : Attribute => Values.Where(e => e.GetEnumAttribute<TA>()!=null);
-        public static T FirstOrDefault<TA>(Func<TA?, bool> pred) where TA : Attribute => WithAttribute(pred).FirstOrDefault();
 
-        public static T Match<TA>(string pred) where TA : Attribute, IStringMatchable => FirstOrDefault<TA>(sm => sm?.Matches(pred)??false);
-        
-        public static T Parse(object o)
+        public static IEnumerable<T> WithAttribute<TA>(Func<TA?, bool> pred) where TA : Attribute =>
+            Values.Where(e => pred(e.GetEnumAttribute<TA>()));
+
+        public static IEnumerable<T> WithAttribute<TA>() where TA : Attribute =>
+            Values.Where(e => e.GetEnumAttribute<TA>() != null);
+
+        public static T FirstOrDefault<TA>(Func<TA?, bool> pred) where TA : Attribute =>
+            WithAttribute(pred).FirstOrDefault();
+
+        public static T Match<TA>(string pred) where TA : Attribute, IStringMatchable =>
+            FirstOrDefault<TA>(sm => sm?.Matches(pred) ?? false);
+
+        public static T Parse(object? o, bool forgiving = false)
         {
-            var ret = TryParse(o);
-            if(null == ret)
+            if (null == o)
+                throw new ArgumentNullException(nameof(o), "Cannot parse \"null\" ino an enum");
+            var ret = TryParse(o, forgiving);
+            if (null == ret)
                 throw new ArgumentException($"Could not parse \"{o}\" into a {typeof(T).SaneName()}");
             return ret.Value;
         }
-        public static T? TryParse(object? o)
+
+        public static T? TryParse(object? o, bool forgiving = false)
         {
             if (null == o) return null;
             var s = o as string ?? o.ToString();
             if (s.IsInt()) return s.AsInt().AsEnum<T>(null);
             if (Enum.TryParse<T>(s, out var res)) return res;
-
-
+            
             foreach (var v in Values)
             {
-                var key = typeof(T).GetMember(v.ToString()).FirstOrDefault()?.CustomAttributes.FirstOrDefaultConstructorArg<string>("Key");
-                if (null == key) continue;
-                if (key.EqualsOic(s))
+                var attrs = typeof(T).GetMember(v.ToString()).FirstOrDefault()?.CustomAttributes.ToList();
+                var names = new[]
+                {
+                    v.GetKeyOrName(),
+                    attrs?.FirstOrDefaultConstructorArg<string>("Key"),
+                    attrs?.FirstOrDefaultConstructorArg<string>("Value")
+                }
+                    .NotNullOrWhitespace()
+                    .ToList();
+                
+                if (names.Any(n => s.EqualsOic(n)))
+                    return v;
+                if (forgiving && names.Any(n => s.ContainsOic(n)))
                     return v;
             }
             return null;

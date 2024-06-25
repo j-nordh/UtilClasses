@@ -26,6 +26,7 @@ public class ClassBuilderLight
 
     public DictionaryOic<HandCodedBlock> Blocks { get; } = new()
     {
+        ["Using"] = HandCodedBlock.FromKeyword("Using"),
         ["Methods"] = HandCodedBlock.FromKeyword("Methods"),
         ["Constructor"] = HandCodedBlock.FromKeyword("Constructor")
     };
@@ -54,6 +55,7 @@ public class ClassBuilderLight
         var ii = !implements.Any() ? "" : $": {implements.Join(", ")}";
         sb.AutoIndentOnCurlyBraces()
             .MaybeAppendLines(withUsing, Using.Select(s => $"using {s};"))
+            .AppendObject(Blocks["Using"].Empty())
             .MaybeAppendLine(FileComment.IsNotNullOrEmpty(), FileComment)
             .AppendLine($"namespace {NameSpace};")
             .MaybeAppendLine(ClassComment.IsNotNullOrEmpty(), ClassComment);

@@ -13,33 +13,40 @@ using UtilClasses.Json;
 
 namespace UtilClasses.Services
 {
-    public class Helper
+    public static class Helper
     {
         public static void SetupDefaultConfig(WebApplicationBuilder builder, JsonSerializerSettings? settings = null)
         {
-            if(null != settings)
+            if (null != settings)
             {
                 JsonConvert.DefaultSettings = () => settings;
-            builder.Services.AddMvc().AddNewtonsoftJson(s => JsonUtil.ApplySettings(s.SerializerSettings));
+                builder.Services.AddMvc().AddNewtonsoftJson(s => JsonUtil.ApplySettings(s.SerializerSettings));
             }
-            
+
             //let's use AppSettings, allow for DEBUG, RELEASE and Production versions and make environment variables accessible.
             builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
-                    optional: true)
+#if DEBUG
+                .AddJsonFile("appsettings.Development.json", optional: true)
+#else
+                .AddJsonFile("appsettings.Production.json", optional: true)
+#endif
                 .AddEnvironmentVariables();
         }
 
-        public static void SetupLogging(WebApplicationBuilder builder, string logDir)
+        public static void SetupLogging(WebApplicationBuilder builder, string logDir,
+            Action<LoggerConfiguration>? setup = null)
         {
-            Log.Logger = new LoggerConfiguration()
+            var cfg = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
+                .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
-                .Filter.With<SkipStatusRequest>()
                 .WriteTo.Console()
-                .WriteTo.File(logDir ?? "", fileSizeLimitBytes: 10485760, rollOnFileSizeLimit: true, retainedFileCountLimit: 20)
-                .CreateLogger();
+                .WriteTo.File(logDir ?? "", fileSizeLimitBytes: 0xA00000L, rollOnFileSizeLimit: true,
+                    retainedFileCountLimit: 20);
+            setup?.Invoke(cfg);
+
+            Log.Logger = cfg.CreateLogger();
             builder.Logging.ClearProviders();
             builder.Logging.AddSerilog(Log.Logger);
         }
@@ -62,7 +69,7 @@ namespace UtilClasses.Services
                 var ping = "/ping";
                 if (uri.ContainsOic(ping) || path.ContainsOic(ping) || requestPath.ContainsOic(ping)) return false;
 
-                
+
                 if (context.ContainsOic("HttpClient"))
                 {
                     var eventId = GetValue(logEvent, "EventId");
@@ -71,8 +78,6 @@ namespace UtilClasses.Services
 
                 return !logEvent.MessageTemplate.Text.Contains("HTTP");
             }
-
         }
-
     }
 }

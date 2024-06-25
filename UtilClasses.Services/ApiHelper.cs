@@ -1,14 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Reflection;
+using System.Runtime.ExceptionServices;
+using System.Threading;
 using System.Threading.Tasks;
+using Common;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Core;
+using UtilClasses.Extensions.Enumerables;
 using UtilClasses.Interfaces;
 using UtilClasses.Json;
 
@@ -19,17 +29,26 @@ public class ApiHelper
 {
     public WebApplication? App { get; private set; }
     public string Name { get; set; }
-    public int Port { get; set; }
+    public int Port { get; set; } = -1;
+
+    public bool? RunAsService { get; set; }
 
     private Action<IServiceCollection>? _configureServices;
     private Func<IServiceCollection, Task>? _configureServicesAsync;
     private Func<WebApplication, Task>? _onStartingAsync;
+    private Action<FirstChanceExceptionEventArgs>? _onException;
     private Action<WebApplication>? _onStarting;
     private WebApplicationBuilder? _builder;
+    private Action<LoggerConfiguration>? _logConfig;
 
     public ApiHelper(string name)
     {
         Name = name;
+    }
+
+    public ApiHelper()
+    {
+        Name = Assembly.GetEntryAssembly()?.GetName().Name ?? "Unknown service";
     }
 
     public T? GetAppSetting<T>(string name)
@@ -39,10 +58,48 @@ public class ApiHelper
         return _builder.Configuration.GetValue<T>(name);
     }
 
+    public T? GetAppSettingObject<T>(string name)
+    {
+        if (null == _builder)
+            throw new NullReferenceException();
+        var section = _builder.Configuration.GetRequiredSection(name);
+        return section.Get<T>();
+    }
+
+    public T GetAppSettingRequiredObject<T>(string name)
+    {
+        var ret = GetAppSettingObject<T>(name);
+        if (null == ret)
+            throw new KeyNotFoundException(
+                $"Could not find a required object matching {name}. Please check the appsettings.json file.");
+        return ret;
+    }
+
+    public List<T> GetAppSettingList<T>(string name) where T : class
+    {
+        if (null == _builder)
+            throw new NullReferenceException();
+        var section = _builder.Configuration.GetSection(name);
+        var children = section.GetChildren();
+        return children
+            .Select(s => s.Get<T>())
+            .NotNull()
+            .ToList();
+    }
+
+    public DbSettings[] GetDbSettings() => GetAppSettingList<DbSettings>("DatabaseConnections")!.ToArray();
+
+
     public void OnConfigureServices(Action<IServiceCollection> a) => _configureServices = a;
     public void OnConfigureServices(Func<IServiceCollection, Task> f) => _configureServicesAsync = f;
     public void OnStarting(Action<WebApplication> a) => _onStarting = a;
     public void OnStarting(Func<WebApplication, Task> f) => _onStartingAsync = f;
+    public void OnException(Action<FirstChanceExceptionEventArgs> a) => _onException = a;
+
+    public void WithLogFilter<T>() where T : ILogEventFilter, new()
+    {
+        _logConfig = cfg => cfg.Filter.With<T>();
+    }
 
 
     protected virtual async Task RunConfigureServices(WebApplicationBuilder builder)
@@ -65,13 +122,34 @@ public class ApiHelper
     {
     }
 
-    public async Task Start(string[] args, int port)
+    public async Task Start(string[] args)
     {
-        _builder = WebApplication.CreateBuilder(args);
-        Port = port;
+        RunAsService ??= !(Debugger.IsAttached || args.Contains("--console"));
+        ServiceWrapper? serviceWrapper = null;
+        if (RunAsService == true)
+        {
+            var webApplicationOptions = new WebApplicationOptions()
+            {
+                Args = args,
+                ContentRootPath = AppContext.BaseDirectory,
+                ApplicationName = Process.GetCurrentProcess().ProcessName
+            };
+            serviceWrapper = new();
+            _builder = WebApplication.CreateBuilder(webApplicationOptions);
+            _builder.Host.UseWindowsService();
+            _builder.Services.AddWindowsService()
+                .AddHostedService(_ => serviceWrapper!);
+        }
+        else
+        {
+            _builder = WebApplication.CreateBuilder(args);
+        }
+
+        Port = GetAppSetting<int>("Port");
+
 
         Helper.SetupDefaultConfig(_builder);
-        Helper.SetupLogging(_builder, "");
+        Helper.SetupLogging(_builder, "", _logConfig);
         LoadStuff(_builder);
 
         Log.Logger.Information("---------------------------------------------");
@@ -81,12 +159,8 @@ public class ApiHelper
 
         _builder.WebHost
             .UseUrls()
-            .UseKestrel(kso =>
-            {
-                //kso.ListenAnyIP(_addressInfo.Port, opt => opt.UseHttps(StoreName.My, "localhost"));
-                //kso.ConfigureHttpsDefaults(o => { o.SslProtocols = SslProtocols.Tls13;});
-                kso.ListenAnyIP(Port);
-            });
+            .UseKestrel(kso => { kso.ListenAnyIP(Port); });
+
         Log.Logger.Information($"Listening to port: {Port}");
         _builder.Services
             .AddRouting()
@@ -130,6 +204,11 @@ public class ApiHelper
         App.UseSwaggerUI(opt =>
             opt.EnableTryItOutByDefault());
 
+        if (null != _onException)
+        {
+            AppDomain.CurrentDomain.FirstChanceException += OnFirstChanceException;
+        }
+
 
         Log.Logger.Information("Application configured successfully");
 
@@ -137,7 +216,35 @@ public class ApiHelper
         Log.Logger.Information("Application Starting");
         await RunOnStarting();
         Log.Logger.Information("---------------------------------------------");
+
         await App.RunAsync();
+    }
+
+    public class ServiceWrapper : IHostedService
+    {
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    private volatile bool _insideFirstChanceExceptionHandler;
+
+    private void OnFirstChanceException(object? sender, FirstChanceExceptionEventArgs args)
+    {
+        if (_insideFirstChanceExceptionHandler)
+            return; // Prevent recursion if an exception is thrown inside this method
+
+        _insideFirstChanceExceptionHandler = true;
+        Try.To(
+            () => _onException?.Invoke(args),
+            e => Log.Logger.Error(e, "Caught exception in global exception handler"),
+            () => _insideFirstChanceExceptionHandler = false);
     }
 }
 

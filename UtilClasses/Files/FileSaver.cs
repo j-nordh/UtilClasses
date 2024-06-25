@@ -99,6 +99,8 @@ namespace UtilClasses.Files
 
         public static HandCodedBlock FromKeyword(string keyword, string prefix = "//############ ", string suffix = " ############", string? content = null) => 
             new HandCodedBlock($"{prefix}Hand Coded {keyword} Start{suffix}", $"{prefix} Hand Coded {keyword} End {suffix}");
+        public static List<HandCodedBlock> FromKeywords(params string[] keywords) => 
+            keywords.Select(kw=> FromKeyword(kw)).ToList();
         public static HandCodedBlock ShortComment(string keyword, string? content) => new($"//Start{keyword}", $"//End{keyword}", content);
         public static HandCodedBlock ShortComment(string keyword) => ShortComment(keyword, null);
 

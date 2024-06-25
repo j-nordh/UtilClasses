@@ -158,7 +158,7 @@ namespace UtilClasses.Extensions.Enumerables
             elems.Where(e => e != null).Select(e=>e!);
 
         public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> elems) where T : struct =>
-            elems.Where(e => e.HasValue).Select(e => e.Value);
+            elems.Where(e => e.HasValue).Select(e => e!.Value);
 
         public static IEnumerable<(TKey, TVal)> NotNull<TKey, TVal>(this IEnumerable<(TKey? K, TVal V)> items)
             where TKey : struct => items.Where(t => t.K != null).Select(t => (t.K.Value, t.V));
@@ -312,13 +312,18 @@ namespace UtilClasses.Extensions.Enumerables
             items.SelectMany(lst => lst);
 
 
-        public static IEnumerable<string> NotNullOrWhitespace(this IEnumerable<string> values) =>
-            values.Where(s => !s.IsNullOrWhitespace());
+        public static IEnumerable<string> NotNullOrWhitespace(this IEnumerable<string?>? values) =>
+            null == values
+                ? new string[]{} 
+                : values.Where(s => !s.IsNullOrWhitespace()).NotNull();
 
-        public static bool ContainsOic(this IEnumerable<string> hay, string needle)
+        public static bool ContainsOic(this IEnumerable<string>? hay, string? needle)
         {
-            if (null == hay) return false;
-            return hay.Contains(needle, StringComparer.OrdinalIgnoreCase);
+            var lst = hay?.ToList();
+            if (lst.IsNullOrEmpty()) return false;
+            return null == needle 
+                ? lst.Any(o => o == null) 
+                : lst.Contains(needle, StringComparer.OrdinalIgnoreCase);
         }
 
         public static IEnumerable<T> Update<T>(this IEnumerable<T> items, Func<T, bool> predicate, Action<T> updater)

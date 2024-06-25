@@ -10,4 +10,8 @@
     <ProjectReference Include="..\UtilClasses\UtilClasses.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.IO.Hashing" Version="8.0.0" />
+  </ItemGroup>
+
 </Project>

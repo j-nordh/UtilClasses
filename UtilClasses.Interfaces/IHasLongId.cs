@@ -6,8 +6,12 @@ namespace UtilClasses.Interfaces
     {
         T Id { get; }
     }
+    public interface IHasWriteId<T> {
+        T Id { get; set; }
+    }
     public interface IHasLongId:IHasId<long>;
     public interface IHasIntId: IHasId<int>;
+    public interface IHasWriteIntId: IHasWriteId<int>;
     public interface IHasGuid : IHasId<Guid>;
 
     public interface IHasCount

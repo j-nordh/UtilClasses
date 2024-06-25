@@ -16,6 +16,7 @@ namespace UtilClasses.Extensions.HashSets
             }
             return true;
         }
+
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> items, IEqualityComparer<T> comp) => new(items, comp);
         
         public static HashSet<string> ToHashSetOic(this IEnumerable<string> items) => new(items, StringComparer.OrdinalIgnoreCase);

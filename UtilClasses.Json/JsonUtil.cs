@@ -6,6 +6,7 @@ using UtilClasses.Files;
 using UtilClasses.Extensions.Objects;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UtilClasses.Cli;
 
 namespace UtilClasses.Json;
 
@@ -15,6 +16,11 @@ public interface IJsonSettingSetter
 }
 public static class JsonUtil
 {
+    public static ConsoleWriter Json(this ConsoleWriter wr, object o)
+    {
+        var json = Serialize(o);
+        return wr.WriteLine(json);
+    }
     public static List<IJsonSettingSetter> Settings { get; } = new List<IJsonSettingSetter>();
     public static JsonSerializerSettings GetSettings()
     {
@@ -58,6 +64,8 @@ public static class JsonUtil
 
     public static T Load<T>(params string[] pathParts) => Get<T>(File.ReadAllText(Path.Combine(pathParts)));
     public static string Serialize(object o) => JsonConvert.SerializeObject(o, GetSettings());
+
+    public static T Clone<T>(T obj) => Get<T>(Serialize(obj));
 
     public static bool SaveIfChanged(string path, object o) => FileSaver.SaveIfChanged(path, Serialize(o));
     public static List<IJsonSettingSetter> SetBcc<T, TKey>(

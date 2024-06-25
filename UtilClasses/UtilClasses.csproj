@@ -23,6 +23,14 @@
 		<EmbeddedResource Include="Resources\LastNames.txt" />
 		<EmbeddedResource Include="Resources\Nouns.txt" />
 		<EmbeddedResource Include="Resources\Places.txt" />
+		<None Remove="Resources\CompanyTypes.txt" />
+		<EmbeddedResource Include="Resources\CompanyTypes.txt" />
+		<None Remove="Resources\RoadNames.txt" />
+		<EmbeddedResource Include="Resources\RoadNames.txt" />
+		<None Remove="Resources\Cities.txt" />
+		<EmbeddedResource Include="Resources\Cities.txt" />
+		<None Remove="Resources\Countries.txt" />
+		<EmbeddedResource Include="Resources\Countries.txt" />
 	</ItemGroup>
 
 	<ItemGroup>
