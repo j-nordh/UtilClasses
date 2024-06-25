@@ -174,8 +174,8 @@ public class ApiHelper
             .AddSingleton(_builder.Services)
             .AddControllers()
             .AddApplicationPart(GetType().Assembly);
-
-
+        Log.Logger.Information("---------------------------------------------");
+        Log.Logger.Information("Configuring the application");
         await RunConfigureServices(_builder);
 
         try
