@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Common;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -66,7 +65,7 @@ public class ApiHelper
         return section.Get<T>();
     }
 
-    public T GetAppSettingRequiredObject<T>(string name)
+    public T GetRequiredAppSettingObject<T>(string name)
     {
         var ret = GetAppSettingObject<T>(name);
         if (null == ret)
@@ -86,10 +85,7 @@ public class ApiHelper
             .NotNull()
             .ToList();
     }
-
-    public DbSettings[] GetDbSettings() => GetAppSettingList<DbSettings>("DatabaseConnections")!.ToArray();
-
-
+    
     public void OnConfigureServices(Action<IServiceCollection> a) => _configureServices = a;
     public void OnConfigureServices(Func<IServiceCollection, Task> f) => _configureServicesAsync = f;
     public void OnStarting(Action<WebApplication> a) => _onStarting = a;
@@ -161,7 +157,7 @@ public class ApiHelper
             .UseUrls()
             .UseKestrel(kso => { kso.ListenAnyIP(Port); });
 
-        Log.Logger.Information($"Listening to port: {Port}");
+        Log.Logger.Information($"Configured port: {Port}");
         _builder.Services
             .AddRouting()
             .AddEndpointsApiExplorer()

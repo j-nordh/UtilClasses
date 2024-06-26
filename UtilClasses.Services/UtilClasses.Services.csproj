@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\WisionEngine\Common\Common.csproj" />
     <ProjectReference Include="..\UtilClasses.Json\UtilClasses.Json.csproj" />
     <ProjectReference Include="..\UtilClasses\UtilClasses.csproj" />
   </ItemGroup>
