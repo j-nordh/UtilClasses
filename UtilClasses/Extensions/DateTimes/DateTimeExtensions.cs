@@ -21,6 +21,8 @@ namespace UtilClasses.Extensions.DateTimes
         public static long ToUnixTime(this DateTime dt) => (dt - _epoch).Ticks/TimeSpan.TicksPerMillisecond;
         public static DateTime ToDateTime(this long unixTimeStamp) => _epoch + TimeSpan.FromMilliseconds(unixTimeStamp);
 
+        public static bool Ish(this DateTime a, DateTime b, int maxDiffMs = 1000) =>
+            Math.Abs((a - b).TotalMilliseconds) < maxDiffMs;
 
         public static string ToSaneString(this DateTime dt) => dt.ToString("s").Replace("T", " ");
         public static string ToSaneString(this DateTime? dt) => dt.HasValue
@@ -35,6 +37,8 @@ namespace UtilClasses.Extensions.DateTimes
         public static DateTime ToStartOfSecond(this DateTime dt)=> dt.Millisecond == 0
             ? dt
             : new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, dt.Kind);
+
+        public static DateTime? ToStartOfSecond(this DateTime? dt) => dt?.ToStartOfSecond();
         public static DateTime ToStartOfMinute(this DateTime dt) => dt.Millisecond==0 && dt.Second ==0?dt
         : new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute,0, dt.Kind);
         public static DateTime ToStartOfHour(this DateTime dt) => dt.Millisecond == 0 && dt.Second == 0  && dt.Minute ==0? dt

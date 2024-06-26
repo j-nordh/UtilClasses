@@ -53,9 +53,8 @@ public class FingerprintBuilder<T>
 
     public FingerprintBuilder<T> Add(Expression<Func<T, int>> me) => AddToString(me);
     public FingerprintBuilder<T> Add(Expression<Func<T, long>> me) => AddToString(me);
-    public FingerprintBuilder<T> AddNullable(Expression<Func<T, long?>> me) => AddToString(me);
-
-    public FingerprintBuilder<T> Add_Nullable<TVal>(Expression<Func<T, TVal?>> me, Func<TVal?, string> f) =>
+    
+    public FingerprintBuilder<T> Add_Nullable<TVal>(Expression<Func<T, TVal?>> me, Func<TVal, string> f) =>
         Add(me, o => o == null ? "" : f(o));
 
     public FingerprintBuilder<T> Add(Expression<Func<T, float>> me) =>
