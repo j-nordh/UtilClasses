@@ -22,7 +22,7 @@ namespace UtilClasses.CodeGeneration
         protected bool IsStatic { get; set; }
         protected virtual string Suffix => "";
 
-        public virtual string BaseConstructorParameters => null;
+        public virtual string? BaseConstructorParameters => null;
 
         public void AppendTo(IndentingStringBuilder sb)
         {

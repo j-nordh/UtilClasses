@@ -45,7 +45,7 @@ public class DebugController : Controller
 
         foreach (var endpoint in endpoints)
         {
-            var c = endpoint.DisplayName.SubstringAfter("Api.").SubstringBefore(".", out var rest)
+            var c =( endpoint.DisplayName??"huh").SubstringAfter("Api.").SubstringBefore(".", out var rest)
                 .RemoveAllOic("Controller");
             var action = rest.SubstringBefore(" (").SubstringAfter(".");
             dict.GetOrAdd(c).Add(action);
@@ -64,7 +64,7 @@ public class DebugController : Controller
         sb.AppendLine(tree.ToString());
 
         var assemblies =
-            endpoints.Select(ep => ep.DisplayName
+            endpoints.Select(ep => ep.DisplayName!
                 .SubstringAfter("(")
                 .SubstringBefore(")")
             ).Distinct();
@@ -133,7 +133,7 @@ public class DebugController : Controller
 
         //var routes = dict.SelectMany(c => c.Value.Select( a => (Controller:c.Key, Action: a)));
         var routes = endpoints
-            .Select(ep => ep.RoutePattern.RawText.SubstringBefore("/{")).Distinct(StringComparer.OrdinalIgnoreCase)
+            .Select(ep => ep.RoutePattern.RawText!.SubstringBefore("/{")).Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         sb.AppendLines($"public static class {name}Routes", "{")

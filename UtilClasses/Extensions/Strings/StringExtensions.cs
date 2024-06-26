@@ -743,7 +743,7 @@ namespace UtilClasses.Extensions.Strings
         }
 
 
-        public static string? Join(this IEnumerable<string>? parts, string separator) =>
+        public static string Join(this IEnumerable<string>? parts, string separator) =>
             null == parts ? "" : string.Join(separator, parts.ToArray());
 
         public static string Join(this IEnumerable<string> parts, Func<string, string> sep)

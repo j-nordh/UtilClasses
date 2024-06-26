@@ -17,7 +17,7 @@ namespace UtilClasses
         public UsageFormatter(string name, IEnumerable<(string name, string description, bool required)>? parameters = null)
         {
             _name = name;
-            Parameters = parameters.SmartToList();
+            Parameters = null == parameters ? [] : parameters.ToList();
             IndentString = "\t";
             Sections = new DictionaryOic<List<(string name, string description, bool required)>>();
         }

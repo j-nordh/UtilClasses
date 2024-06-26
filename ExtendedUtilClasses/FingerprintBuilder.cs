@@ -82,7 +82,7 @@ public class FingerprintBuilder<T>
         Add(me, f => f.ToHexString());
 
     public FingerprintBuilder<T> Add_Nullable(Expression<Func<T, byte[]?>> me) =>
-        Add(me, f => f.ToHexString());
+        Add(me, f => (f?? []).ToHexString());
 
     public FingerprintBuilder<T> Add(Expression<Func<T, DateOnly>> me) =>
         Add(me, f => f.ToSaneString());

@@ -395,7 +395,7 @@ namespace UtilClasses.Extensions.Enumerables
             {
                 if (!q.Any()) break;
                 if (count >= fs.Count()) break;
-                ret.Add(f(q.Dequeue(index)).SmartToList());
+                ret.Add(f(q.Dequeue(index)).ToList());
             }
             return ret;
         }
@@ -491,25 +491,7 @@ namespace UtilClasses.Extensions.Enumerables
 
         public static IEnumerable<TOut> SelectManyStripNull<TIn, TOut>(this IEnumerable<TIn> items, Func<TIn, IEnumerable<TOut>> f) where TIn : class where TOut : class
             => items.NotNull().Select(f).NotNull().SelectMany().NotNull();
-
-        [ContractAnnotation("allowNull:false=>notnull")]
-        [ContractAnnotation("allowNull:true=>canbenull")]
-        public static List<T>? SmartToList<T>(this IEnumerable<T>? items, bool allowNull = false)
-        {
-            if (null == items) return allowNull ? null : new List<T>();
-            var lst = items.ToList();
-            if (!lst.Any()) return new List<T>();
-            return items as List<T> ?? lst?.ToList() ?? (allowNull ? null : new List<T>());
-        }
-
-        //public static IEnumerable<TOut> Select<TIn, TOut>(this IEnumerable<TIn> items, Dictionary<TIn, TOut> dict)
-        //{
-        //    foreach (var i in items)
-        //    {
-        //        yield return dict[i];
-        //    }
-        //}
-        //public static TOut Sum<TIn, TOut>(this IEnumerable<TIn> items, Dictionary<TIn, TOut> dict) => items.Aggregate(dict, (a,b)=>Operator)
+        
         public static TOut Aggregate<TIn, TOut>(this IEnumerable<TIn> items, Dictionary<TIn, TOut> dict,Func<TOut, TOut, TOut> f)
         {
             return items.Where(dict.ContainsKey).Select(k =>dict[k]).Aggregate(f);

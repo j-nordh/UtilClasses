@@ -26,6 +26,7 @@ namespace UtilClasses
         private Func<string, string, Exception> _fEx;
         public Ensure(bool isArg)
         {
+            _location = "";
             if (isArg)
             {
                 _fNull = s => new ArgumentNullException(s);
@@ -47,14 +48,14 @@ namespace UtilClasses
         }
 
         [ContractAnnotation("obj:null=>halt")]
-        public void NotNull<TException>(object obj, string message) where TException : Exception
+        public void NotNull<TException>(object? obj, string message) where TException : Exception
         {
             if (null != obj) return;
             Throw<TException>(message);
         }
 
         [ContractAnnotation("obj:null=>halt")]
-        public void NotNull(object obj, string message)
+        public void NotNull(object? obj, string message)
         {
             if (null != obj) return;
             Throw(message);

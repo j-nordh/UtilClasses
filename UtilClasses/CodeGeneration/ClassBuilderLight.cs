@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UtilClasses.Extensions.Enumerables;
 using UtilClasses.Extensions.Strings;
@@ -9,20 +10,20 @@ namespace UtilClasses.CodeGeneration;
 public class ClassBuilderLight
 {
     public string Name { get; }
-    public string NameSpace { get; set; }
+    public string? NameSpace { get; set; }
     public bool IsStatic { get; set; }
     public string AccessModifier { get; set; } = "public";
     public List<string> Using { get; } = new();
     public List<string> Props { get; } = new();
-    public string ConstructorBody { get; set; }
-    public string StaticConstructorBody { get; set; }
+    public string? ConstructorBody { get; set; }
+    public string? StaticConstructorBody { get; set; }
     public List<string> ConstructorArgs { get; } = new();
     public List<string> Implements { get; } = new();
     public List<string> Methods { get; } = new();
     public string? Inherits { get; set; }
     public List<string> Attributes { get; } = new();
-    public string FileComment { get; set; }
-    public string ClassComment { get; set; }
+    public string? FileComment { get; set; }
+    public string? ClassComment { get; set; }
 
     public DictionaryOic<HandCodedBlock> Blocks { get; } = new()
     {
@@ -52,6 +53,8 @@ public class ClassBuilderLight
         if (Inherits.IsNotNullOrEmpty())
             implements.Insert(0, Inherits);
 
+        if (null == NameSpace)
+            throw new ArgumentException("Namespace cannot be null");
         var ii = !implements.Any() ? "" : $": {implements.Join(", ")}";
         sb.AutoIndentOnCurlyBraces()
             .MaybeAppendLines(withUsing, Using.Select(s => $"using {s};"))
@@ -71,6 +74,7 @@ public class ClassBuilderLight
             .Maybe(ConstructorArgs.Any(), () => sb
                 .AppendLines($"public {Name}({ConstructorArgs}).Join(", ")}){baseInitializer}",
                     "{")
+                .AppendLine(ConstructorBody)
                 .AppendObject(Blocks["Constructor"].Empty())
                 .AppendLine("}"))
             .AppendLines(Methods)

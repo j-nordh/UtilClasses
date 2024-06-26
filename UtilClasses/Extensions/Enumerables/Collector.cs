@@ -10,7 +10,7 @@ namespace UtilClasses.Extensions.Enumerables
         List<TOut> _collected;
         public Collector(IEnumerable<TIn> cols)
         {
-            _cols = cols.SmartToList(false);
+            _cols = cols.ToList();
             _collected = new List<TOut>();
         }
 
