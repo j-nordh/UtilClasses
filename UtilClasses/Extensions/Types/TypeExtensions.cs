@@ -59,7 +59,7 @@ namespace UtilClasses.Extensions.Types
                 : "";
             if (generic.IsNotNullOrEmpty())
             {
-                var parts = generic.SubstringAfter("[").SubstringBeforeLast("]").SplitREE("],[")
+                var parts = generic.SubstringAfter("[").SubstringBeforeLast("]").SplitRemoveEmptyEntries("],[")
                     .Select(s => s.Trim('[', ']').SubstringBefore(",").SimplifyTypeName()).ToList();
                 generic = $"<{parts.Join(", ")}>";
             }

@@ -8,7 +8,7 @@ namespace UtilClasses
     {
         private int _indent;
         private StringBuilder _sb;
-        private StringBuilder _sbBackup;
+        private StringBuilder? _sbBackup;
         private List<string> _items; 
         private bool _inItem;
         private bool _newLine;
@@ -91,7 +91,7 @@ namespace UtilClasses
         {
             if (!_itemizationStarted) throw new AccessViolationException();
             if(_inItem) EndItem();
-            _sb = _sbBackup;
+            _sb = _sbBackup?? new StringBuilder();
             _sb.Append(string.Join(separator, _items));
             _items.Clear();
             _itemizationStarted = false;

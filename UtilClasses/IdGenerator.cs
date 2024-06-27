@@ -49,7 +49,7 @@ namespace UtilClasses
 
             Places = ass.GetResourceString("Places.txt")
                 .SplitLines()
-                .Select(l => l.SplitREE(";"))
+                .Select(l => l.SplitRemoveEmptyEntries(";"))
                 .Where(ps => ps.Length == 3)
                 .Select(ps => (ps[0], ps[2].AsDecimal(), ps[1].AsDecimal()))
                 .ToList();

@@ -9,7 +9,7 @@ public class AsyncObjectCacher<T>
     private TimeSpan _cacheTimeout;
     private DateTime _lastUpdate = DateTime.MinValue;
     private TimeSpan? _minRefreshDelay;
-    private T _obj;
+    private T? _obj;
 
     public AsyncObjectCacher(Func<Task<T>> updateFunc)
     {
@@ -45,6 +45,7 @@ public class AsyncObjectCacher<T>
     public async Task<T> Get()
     {
         await UpdateIfNeeded();
+        if(null == _obj) throw new NullReferenceException("The cached object is null");
         return _obj;
     }
 

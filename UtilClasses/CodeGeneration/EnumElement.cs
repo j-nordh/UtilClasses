@@ -9,7 +9,7 @@ namespace UtilClasses.CodeGeneration
 {
     public class EnumElement : ICodeElement
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = "UNNAMED";
         public string Modifier { get; set; } = "public";
         public List<Member> Members { get; set; } = new List<Member>();
         public List<string> Requires { get; set; }
@@ -31,17 +31,17 @@ namespace UtilClasses.CodeGeneration
 
         public class Member:IAppendable
         {
-            public List<string> Attributes;
+            public List<string> Attributes=new();
             public string Name;
-            public int Id;
+            public int Id=0;
 
             public virtual IndentingStringBuilder AppendObject(IndentingStringBuilder sb) => sb
                 .AppendLines(Attributes)
                 .Append($"{Name} = {Id}");
 
-            public Member()
+            public Member(string name)
             {
-                Attributes = new List<string>();
+                Name = name;
             }
 
         }
