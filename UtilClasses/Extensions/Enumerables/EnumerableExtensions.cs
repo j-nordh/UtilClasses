@@ -365,7 +365,7 @@ namespace UtilClasses.Extensions.Enumerables
                 : lst[lst.Count / 2];
         }
 
-        public static HashSet<T> AddRange<T>(this HashSet<T> set, IEnumerable<T> items) =>
+        public static HashSet<T>? AddRange<T>(this HashSet<T> set, IEnumerable<T> items) =>
             set?.Do(s => items.ForEach(i => s.Add(i)));
 
         public static IEnumerable<T> Apply<T>(this IEnumerable<T> items, Action<T> a)
@@ -529,7 +529,6 @@ namespace UtilClasses.Extensions.Enumerables
 
         public static List<T> Intersect<T>(this IEnumerable<IEnumerable<T>> bunches, IEqualityComparer<T> cmp)
         {
-            if (null == bunches) return null;
             var lists = bunches.Select(b => b.ToList()).ToList();
             if (lists.Count == 1) return lists.Single();
             var ret = lists.First();

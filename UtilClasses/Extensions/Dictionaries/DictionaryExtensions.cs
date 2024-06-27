@@ -433,7 +433,7 @@ namespace UtilClasses.Extensions.Dictionaries
             IDictionary<TKey, List<TVal>> dict)
             => IntoDict(new[] { t }, dict);
 
-        public static Dictionary<TKey, List<TVal>> Filter<TKey, TVal>(this Dictionary<TKey, List<TVal>> dict, TKey key,
+        public static Dictionary<TKey, List<TVal>>? Filter<TKey, TVal>(this Dictionary<TKey, List<TVal>>? dict, TKey key,
             Func<TVal, bool> predicate)
         {
             if (dict == null) return null;

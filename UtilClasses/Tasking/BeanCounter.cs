@@ -14,6 +14,11 @@ namespace UtilClasses.Tasking
         private readonly AsyncValue<int> _balance = new((a, b) => a + b);
         private static IndentingStringBuilder _log = new("  ");
 
+        public BeanCounter(string name)
+        {
+            Name = name;
+        }
+
         private int Balance => _balance.Value;
 
         public ulong Added { get; private set; }

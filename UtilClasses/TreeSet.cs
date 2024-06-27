@@ -102,7 +102,7 @@ namespace UtilClasses
                 : "";
             sb.AppendLine($"{Name ?? "<root>"}{leafStr}");
             
-            var children = _children.Values.AsSorted(ts => ts.Name);
+            var children = _children.Values.OrderBy(ts => ts.Name).ToList();
             for (int i = 0; i < children.Count; i++)
             {
                 var child = children[i];

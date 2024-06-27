@@ -251,7 +251,7 @@ public class BorderHandler : ICloneable<BorderHandler>
             _allRows.ForEach(r => r.LineOnNull = value);
         }
     }
-    public char Between(string prev, string val)
+    public char Between(string? prev, string? val)
     {
         return (prev, val) switch
         {

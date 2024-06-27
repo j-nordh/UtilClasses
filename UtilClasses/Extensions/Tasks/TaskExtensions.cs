@@ -104,7 +104,7 @@ namespace UtilClasses.Extensions.Tasks
         };
         public static Task RunAsTask(this Action a) => Task.Run(a);
         public static Task<T> RunAsTask<T>(this Func<T> f) => Task.Run(f);
-        public static Task<T> SuccessOrNull<T>(this Task<T> task) where T : class =>
+        public static Task<T?> SuccessOrNull<T>(this Task<T> task) where T : class =>
             task.ContinueWith(t => (t.IsFaulted || t.IsCanceled) ? null : t.Result);
 
         public static Task<T?> SuccessOrNull<T>(this Task<T?> task) where T : struct =>

@@ -172,7 +172,6 @@ namespace UtilClasses.Extensions.Strings
         }
         public static IEnumerable<Chunk> FromString(string s, char startDelimiter, char stopDelimiter, bool onlyTopNodes)
         {
-            if (null == s) return null;
             int starts = s.Count(c => c == startDelimiter);
             if (starts == 0 || starts != s.Count(c => c == stopDelimiter))
                 throw new ArgumentException("The supplied file does not have matching delimiters.");

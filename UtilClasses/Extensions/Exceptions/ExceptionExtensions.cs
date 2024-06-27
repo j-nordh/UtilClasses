@@ -20,7 +20,7 @@ namespace UtilClasses.Extensions.Exceptions
             .AppendLine($"Type: {ex.GetType()}")
             .Maybe(ex.StackTrace.IsNotNullOrEmpty(), x => x
                 .AppendLine("StackTrace: ")
-                .AppendLines(ex.StackTrace.SplitREE(Environment.NewLine)))
+                .AppendLines(ex.StackTrace.SplitRemoveEmptyEntries(Environment.NewLine)))
             .Maybe(ex.Data.Count > 0, x => x
                 .AppendLine("Data: ").Indent()
                 .AppendObjects(ex.Data.Keys.Cast<object>(), key => $"{key}: {ex.Data[key]}")).Outdent()

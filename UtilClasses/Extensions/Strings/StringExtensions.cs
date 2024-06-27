@@ -4,14 +4,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 using UtilClasses.Extensions.Decimals;
 using UtilClasses.Extensions.Dictionaries;
 using UtilClasses.Extensions.Doubles;
 using UtilClasses.Extensions.Enumerables;
-using UtilClasses.Extensions.Expressions;
 using UtilClasses.Extensions.Integers;
 using UtilClasses.Extensions.Lists;
 using UtilClasses.Extensions.Objects;
@@ -23,6 +21,7 @@ namespace UtilClasses.Extensions.Strings
     /// <summary>
     /// Extensions for <see cref="System.String"/>
     /// </summary>
+    [PublicAPI]
     public static class StringExtensions
     {
         static Dictionary<Type, (Func<string, bool> Check, Func<string, object> Conv)> _typeConverters =
@@ -44,7 +43,7 @@ namespace UtilClasses.Extensions.Strings
 
         static void SetConv<T>(Func<string, bool> check, Func<string, T> conv)
         {
-            _typeConverters[typeof(T)] = (check, s => conv(s));
+            _typeConverters[typeof(T)] = (check, s => conv(s)!);
         }
 
         /// <summary>
@@ -86,7 +85,7 @@ namespace UtilClasses.Extensions.Strings
         /// <returns>A copy of format in which the format items have been replaced by the string representation of the corresponding objects in args.</returns>
         public static string FormatWith(this string format, params object[] args)
         {
-            return System.String.Format(format, args);
+            return string.Format(format, args);
         }
 
         /// <summary>
@@ -94,13 +93,7 @@ namespace UtilClasses.Extensions.Strings
         /// </summary>
         /// <param name="value">The string value to check</param>
         /// <returns>Null if <paramref name="value"/> is empty or the original value of <paramref name="value"/>.</returns>
-        public static string NullIfEmpty(this string value)
-        {
-            if (value == System.String.Empty)
-                return null;
-
-            return value;
-        }
+        public static string? NullIfEmpty(this string value) => value == string.Empty ? null : value;
 
         /// <summary>
         /// Separates a PascalCase string
@@ -161,7 +154,7 @@ namespace UtilClasses.Extensions.Strings
 
         public static bool EndsWithIc2(this string s, string s2)
         {
-            return s?.EndsWith(s2, StringComparison.InvariantCultureIgnoreCase) ?? false;
+            return s.EndsWith(s2, StringComparison.InvariantCultureIgnoreCase);
         }
 
         public static bool EndsWithOic(this string s, string end) =>
@@ -214,7 +207,6 @@ namespace UtilClasses.Extensions.Strings
 
         public static string StripAllGenerics(this string s)
         {
-            if (null == s) return null;
             var start = s.LastIndexOf('<');
             if (start == -1) return s;
             var end = s.IndexOf('>', start);
@@ -253,7 +245,6 @@ namespace UtilClasses.Extensions.Strings
             out int count)
         {
             count = 0;
-            newValue ??= "";
             if (s.IsNullOrEmpty()) return s;
             if (oldValue.IsNullOrEmpty()) return s;
             if (oldValue.EqualsIc2(newValue)) return s;
@@ -284,7 +275,7 @@ namespace UtilClasses.Extensions.Strings
 
         public static string InsertAfter(this string s, string marker, string val)
         {
-            var i = s.IndexOf(marker) + marker.Length;
+            var i = s.IndexOf(marker, StringComparison.CurrentCulture) + marker.Length;
             return s.Insert(i, val);
         }
 
@@ -308,8 +299,10 @@ namespace UtilClasses.Extensions.Strings
         public static string RemoveAll(this string s, params string[] needles) =>
             needles.Aggregate(s, (current, n) => current.Replace(n, ""));
 
-        public static string RemoveAllOic(this string s, params string[] needles) =>
-            needles.Aggregate(s, (current, n) => current.ReplaceOic(n, ""));
+        public static string? RemoveAllOic(this string? s, params string[] needles) =>
+            null == s
+                ? null
+                : needles.Aggregate(s, (current, n) => current.ReplaceOic(n, ""));
 
         public static string RemoveAllWhitespace(this string s)
             => s.RemoveAll(" ", "\t", "\r", "\n", Convert.ToChar(160).AsString());
@@ -332,19 +325,16 @@ namespace UtilClasses.Extensions.Strings
         public static IEnumerable<string?> DistinctOic(this IEnumerable<string?> strings)
             => strings.Distinct(StringComparer.OrdinalIgnoreCase);
 
-        public static bool EqualsAnyOic(this string? s, IEnumerable<string?> vals) =>
-            vals?.Any(s.EqualsOic) ?? false;
+        public static bool EqualsAnyOic(this string? s, IEnumerable<string?> values) =>
+            values.Any(s.EqualsOic);
 
 
-        public static bool EqualsAnyOic(this string? s, params string?[] vals) => s.EqualsAnyOic(vals.AsEnumerable());
-
-        [Obsolete("Use EqualsAnyOic instead")]
-        public static bool InOic(this string s, IEnumerable<string> vals) =>
-            vals?.Any(s.EqualsOic) ?? false;
+        public static bool EqualsAnyOic(this string? s, params string?[] values) =>
+            s.EqualsAnyOic(values.AsEnumerable());
 
 
         [Obsolete("Use EqualsAnyOic instead")]
-        public static bool InOic(this string? s, params string[] vals) => s.EqualsAnyOic(vals.AsEnumerable());
+        public static bool InOic(this string? s, params string[] values) => s.EqualsAnyOic(values.AsEnumerable());
 
         public static bool AsBoolean(this string? s)
         {
@@ -355,10 +345,12 @@ namespace UtilClasses.Extensions.Strings
             if (s.EqualsOic("yes")) return true;
             if (s.EqualsOic("yea")) return true;
             if (s.EqualsOic("ja")) return true;
+            // ReSharper disable StringLiteralTypo
             if (s.EqualsOic("japp")) return true;
             if (s.EqualsOic("visst")) return true;
             if (s.EqualsOic("kanske")) return false;
             if (s.ContainsOic("huvudvärk")) return false;
+            // ReSharper restore StringLiteralTypo
             return false;
         }
 
@@ -373,12 +365,12 @@ namespace UtilClasses.Extensions.Strings
         public static bool IsDateTime(this string s) => DateTime.TryParse(s, out var _);
 
         public static DateTime? MaybeAsDateTime(this string s) =>
-            DateTime.TryParse(s, out var ret) ? (DateTime?)ret : null;
+            DateTime.TryParse(s, out var ret) ? ret : null;
 
         public static DateTime? MaybeAsDateTime(this string s, string format) =>
             DateTime.TryParseExact(s, format, CultureInfo.GetCultureInfo("sv-SE"), DateTimeStyles.AssumeLocal,
                 out var ret)
-                ? (DateTime?)ret
+                ? ret
                 : null;
 
         public static Guid AsGuid(this string s) => Guid.Parse(s);
@@ -395,24 +387,25 @@ namespace UtilClasses.Extensions.Strings
         public static T? MaybeAs<T>(this string s) where T : struct
         {
             if (s.IsNullOrWhitespace()) return null;
-            var (Check, Conv) = _typeConverters.GetOrThrow(typeof(T),
+            var (check, conv) = _typeConverters.GetOrThrow(typeof(T),
                 () => throw new NotImplementedException($"No converter specified for type {typeof(T).Name}"));
-            if (!Check(s)) return null;
-            return (T)Conv(s);
+            if (!check(s)) return null;
+            return (T)conv(s);
         }
 
-        public static byte? MaybeAsByte(this string s) => byte.TryParse(s, out var ret) ? (byte?)ret : null;
+        public static byte? MaybeAsByte(this string s) => byte.TryParse(s, out var ret) ? ret : null;
         public static byte? MaybeAsByte(this string s, bool predicate) => predicate ? s.MaybeAsByte() : null;
 
         public static T AsEnum<T>(this string s, bool ignoreCase = true)
         {
-            if (!typeof(T).IsEnum) throw new System.Exception($"The supplied type {typeof(T).Name} is not an Enum.");
+            if (!typeof(T).IsEnum) throw new Exception($"The supplied type {typeof(T).Name} is not an Enum.");
             return (T)Enum.Parse(typeof(T), s, ignoreCase);
         }
 
-        private static readonly Dictionary<string, DayOfWeek> _dayDict =
-            new Dictionary<string, DayOfWeek>(StringComparer.OrdinalIgnoreCase)
+        private static readonly DictionaryOic<DayOfWeek> _dayDict =
+            new()
             {
+                // ReSharper disable StringLiteralTypo
                 ["måndag"] = DayOfWeek.Monday,
                 ["tisdag"] = DayOfWeek.Tuesday,
                 ["onsdag"] = DayOfWeek.Wednesday,
@@ -420,6 +413,7 @@ namespace UtilClasses.Extensions.Strings
                 ["fredag"] = DayOfWeek.Friday,
                 ["lördag"] = DayOfWeek.Saturday,
                 ["söndag"] = DayOfWeek.Sunday,
+                // ReSharper restore StringLiteralTypo
                 ["monday"] = DayOfWeek.Monday,
                 ["tuesday"] = DayOfWeek.Tuesday,
                 ["wednesday"] = DayOfWeek.Wednesday,
@@ -432,42 +426,24 @@ namespace UtilClasses.Extensions.Strings
         public static DayOfWeek AsDayOfWeek(this string s) => _dayDict[s];
         public static bool IsDayOfWeek(this string s) => _dayDict.ContainsKey(s);
 
-        public static int IndexOfIc2(this string str, string needle)
-        {
-            if (null == str || null == needle) return -1;
-            return str.IndexOf(needle, StringComparison.InvariantCultureIgnoreCase);
-        }
-
-        public static int IndexOfIc2(this string str, string needle, int start)
-        {
-            if (null == str || null == needle) return -1;
-            return str.IndexOf(needle, start, StringComparison.InvariantCultureIgnoreCase);
-        }
-
-        public static int IndexOfOic(this string str, string needle)
-        {
-            if (null == str || null == needle) return -1;
-            return str.IndexOf(needle, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public static int IndexOfOic(this string str, string needle, int start)
+        public static int IndexOfOic(this string? str, string? needle, int start = 0)
         {
             if (null == str || null == needle) return -1;
             return str.IndexOf(needle, start, StringComparison.OrdinalIgnoreCase);
         }
 
-        public static string[] SplitREE(this string str, params char[] cs)
+        public static string[] SplitRemoveEmptyEntries(this string str, params char[] cs)
         {
             return str.Split(cs, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        public static string[] SplitREE(this string str, params string[] ss)
+        public static string[] SplitRemoveEmptyEntries(this string str, params string[] ss)
         {
             return str.Split(ss, StringSplitOptions.RemoveEmptyEntries);
         }
 
 
-        public static string[] SplitLines(this string str, bool removeEmptyEntries = false)
+        public static string[] SplitLines(this string? str, bool removeEmptyEntries = false)
         {
             if (null == str)
                 return new string[] { };
@@ -496,20 +472,20 @@ namespace UtilClasses.Extensions.Strings
             return str.SplitLines().Length;
         }
 
-        public static string SubstringAfter(this string str, char needle, int length = -1) =>
+        public static string? SubstringAfter(this string str, char needle, int length = -1) =>
             str.SubstringAfter($"{needle}", length);
 
-        public static string SubstringAfter(this string str, string needle, int length = -1)
+        public static string? SubstringAfter(this string? str, string needle, int length = -1)
         {
             if (null == str) return null;
-            int index = str.IndexOfIc2(needle);
+            int index = str.IndexOfOic(needle);
 
             if (index < 0) index = 0;
             else index += needle.Length;
             return length > 0 ? str.Substring(index, length) : str.Substring(index);
         }
 
-        public static string SubstringStartingWith(this string str, string needle,
+        public static string? SubstringStartingWith(this string str, string needle,
             StringComparison sc = StringComparison.OrdinalIgnoreCase)
         {
             int i = str.IndexOf(needle, sc);
@@ -524,15 +500,16 @@ namespace UtilClasses.Extensions.Strings
         }
 
 
-        public static string SubstringBefore(this string str, char needle) =>
+        public static string? SubstringBefore(this string? str, char needle) =>
             SubstringBefore(str, new[] { $"{needle}" }, out _);
 
-        public static string SubstringBefore(this string str, string needle) =>
+        public static string? SubstringBefore(this string? str, string needle) =>
             SubstringBefore(str, new[] { needle }, out _);
 
-        public static string SubstringBeforeLast(this string str, string needle,
+        public static string? SubstringBeforeLast(this string? str, string needle,
             StringComparison sc = StringComparison.OrdinalIgnoreCase)
         {
+            if (null == str) return null;
             var index = str.LastIndexOf(needle, sc);
             return index < 0 ? str : str.Substring(0, index);
         }
@@ -552,13 +529,19 @@ namespace UtilClasses.Extensions.Strings
             return str.Substring(start, end - start);
         }
 
-        public static string SubstringBefore(this string str, char needle, out string rest, bool keepMarker = true) =>
+        public static string? SubstringBefore(this string? str, char needle, out string? rest,
+            bool keepMarker = true) =>
             str.SubstringBefore($"{needle}", out rest, keepMarker);
 
-        public static string SubstringBefore(this string str, string needle, out string rest, bool keepMarker = true)
-            => str.SubstringBefore(new[] { needle }, out rest, keepMarker);
+        public static string? SubstringBefore(this string? str, string needle, out string? rest, bool keepMarker = true)
+        {
+            rest = null;
+            return null == str
+                ? null
+                : str.SubstringBefore(new[] { needle }, out rest, keepMarker);
+        }
 
-        public static string SubstringBefore(this string str, IEnumerable<string> needles, bool keepMarker = true)
+        public static string? SubstringBefore(this string? str, IEnumerable<string> needles, bool keepMarker = true)
         {
             return SubstringBefore(str, needles, out _, keepMarker);
         }
@@ -569,7 +552,7 @@ namespace UtilClasses.Extensions.Strings
             matchingNeedle = null;
             foreach (var needle in needles)
             {
-                var index = str.IndexOfIc2(needle);
+                var index = str.IndexOfOic(needle);
                 if (index < 0) continue;
                 if (index < ret)
                 {
@@ -581,9 +564,11 @@ namespace UtilClasses.Extensions.Strings
             return int.MaxValue == ret ? -1 : ret;
         }
 
-        public static string SubstringBefore(this string str, IEnumerable<string> needles, out string rest,
+        public static string? SubstringBefore(this string? str, IEnumerable<string> needles, out string? rest,
             bool keepMarker = true)
         {
+            rest = null;
+            if (null == str) return null;
             var index = str.IndexOfAny(needles, out string? match);
             if (index < 0 || null == match)
             {
@@ -597,15 +582,16 @@ namespace UtilClasses.Extensions.Strings
 
         public static string TrimBefore(this string str, string needle)
         {
-            int index = str.IndexOfIc2(needle);
+            int index = str.IndexOfOic(needle);
             if (index < 0) return "";
             return index == 0 ? str : str.Substring(index);
         }
 
-        public static string TrimAll(this string str, params char[] needles) => str.TrimAll(true, needles);
+        public static string? TrimAll(this string? str, params char[] needles) => str.TrimAll(true, needles);
 
-        public static string TrimAll(this string str, bool whitespace, params char[] needles)
+        public static string? TrimAll(this string? str, bool whitespace, params char[] needles)
         {
+            if (null == str) return null;
             int len;
             do
             {
@@ -634,7 +620,7 @@ namespace UtilClasses.Extensions.Strings
             return int.Parse(
                 new string(
                     str.SubstringAfter(needle)
-                        .Trim()
+                        ?.Trim()
                         .TakeWhile(char.IsNumber).ToArray()));
         }
 
@@ -787,6 +773,7 @@ namespace UtilClasses.Extensions.Strings
                 return $"{char.ToLower(str[0])}{str.Substring(1)}";
             }
 
+            [PublicAPI]
             public string PascalCase()
             {
                 if (_str.IsNullOrEmpty()) return _str;
@@ -795,7 +782,7 @@ namespace UtilClasses.Extensions.Strings
                 var count = _str.Count(splitPoints.Contains);
                 if (count > 0)
                     return _str
-                        .SplitREE(splitPoints)
+                        .SplitRemoveEmptyEntries(splitPoints)
                         .Where(s => s.Length > 0)
                         .Select(s => char.ToUpper(s[0]) + s.Substring(1).ToLower())
                         .Join("");
@@ -847,17 +834,17 @@ namespace UtilClasses.Extensions.Strings
 
         public static bool IsXml(this string s) => !s.IsNullOrEmpty() && s[0] == '<' && s.Last() == '>';
 
-        public static bool IsInt(this string s) => s.All(c => !char.IsLetter(c)) && int.TryParse(s, out int i);
+        public static bool IsInt(this string s) => s.All(c => !char.IsLetter(c)) && int.TryParse(s, out int _);
 
 
         public static bool IsEnum<T>(this string s) where T : struct
         {
-            return Enum.TryParse(s, true, out T v);
+            return Enum.TryParse(s, true, out T _);
         }
 
         public static bool IsUri(this string s, UriKind kind = UriKind.Absolute) => s.AsUri(kind) != null;
 
-        public static Uri AsUri(this string s, UriKind kind = UriKind.Absolute, params string[] schemes)
+        public static Uri? AsUri(this string s, UriKind kind = UriKind.Absolute, params string[] schemes)
         {
             if (s.IsNullOrWhitespace()) return null;
             if (!Uri.TryCreate(s, kind, out Uri ret)) return null;
@@ -886,9 +873,6 @@ namespace UtilClasses.Extensions.Strings
             if (predicate(o)) return s + f(o);
             return s + falseValue;
         }
-
-        public static string AppendNNW(this string s, string o, Func<string, string> f, string falseValue = "") =>
-            Append(s, o, m => !m.IsNullOrWhitespace(), f, falseValue);
 
         public static string AppendIfNotNullOrEmpty(this string s, string o, Func<string, string> f,
             string? nullValue = null)
@@ -978,21 +962,21 @@ namespace UtilClasses.Extensions.Strings
             }
         }
 
-        private static List<(string str, string xml)> _xmlChars = new()
-        {
+        private static List<(string str, string xml)> _xmlChars =
+        [
             ("\"", "&quot;"),
             ("'", "&apos;"),
             ("<", "&lt;"),
             (">", "&gt;"),
             ("&", "&amp;")
-        };
+        ];
 
-        private static List<(string str, string control)> _controlChars = new()
-        {
+        private static List<(string str, string control)> _controlChars =
+        [
             ("\\r", "\r"),
             ("\\n", "\n"),
-            ("\\t", "\t"),
-        };
+            ("\\t", "\t")
+        ];
 
         public static string EscapeForXml(this string input) =>
             _xmlChars.Aggregate(input, (s, r) => s.ReplaceOic(r.str, r.xml));
@@ -1009,7 +993,7 @@ namespace UtilClasses.Extensions.Strings
         public static string RestoreControlChars(this string input) =>
             _controlChars.Aggregate(input, (s, c) => s.ReplaceOic(c.str, c.control));
 
-        public static bool IsNullOrEquals(this string pattern, string candidate,
+        public static bool IsNullOrEquals(this string? pattern, string? candidate,
             StringComparison sc = StringComparison.Ordinal) =>
             pattern == null && candidate == null ||
             pattern != null && candidate != null && candidate.Equals(pattern, sc);
@@ -1017,13 +1001,13 @@ namespace UtilClasses.Extensions.Strings
         public static bool IsNullOrEqualsOic(this string pattern, string candidate) =>
             pattern.IsNullOrEquals(candidate, StringComparison.OrdinalIgnoreCase);
 
-        public static bool IsNullOrIn(this string pattern, string candidate) =>
+        public static bool IsNullOrIn(this string? pattern, string candidate) =>
             pattern == null || candidate.ContainsOic(pattern);
 
         public static bool IsNullOrAny(this string pattern, params string[] candidates) =>
             pattern.IsNullOrAny(StringComparison.OrdinalIgnoreCase, candidates);
 
-        public static bool IsNullOrAny(this string pattern, StringComparison sc, params string[] candidates) =>
+        public static bool IsNullOrAny(this string? pattern, StringComparison sc, params string[] candidates) =>
             pattern == null || candidates.Any(c => pattern.Equals(c, sc));
 
         //public static bool SaveIfChanged(this string content, string path, bool force = false, bool removeWhitespace = true, bool ignoreCase = true, Encoding encoding = null)
@@ -1048,33 +1032,6 @@ namespace UtilClasses.Extensions.Strings
         //}
 
         public static FileSaver GetSaver(this string content, string path) => new FileSaver(path).WithContent(content);
-
-        public static void SplitAssign(this string str, string delimiter, out string first, out string second,
-            bool trim = true)
-        {
-            var parts = str.SplitREE(delimiter);
-            first = parts[0];
-            second = parts[1];
-            if (!trim) return;
-            first = first.Trim();
-            second = second.Trim();
-        }
-
-        public static void SplitAssign(this string str, string delimiter, Action<string> first, Action<string> second,
-            bool trim = true)
-        {
-            str.SplitAssign(delimiter, out var a, out var b, trim);
-            first(a);
-            second(b);
-        }
-
-        public static void SplitAssign(this string str, string delimiter, object owner, Expression<Func<string>> first,
-            Expression<Func<string>> second, bool trim = true)
-        {
-            str.SplitAssign(delimiter, out var a, out var b, trim);
-            first.Set(owner, a);
-            second.Set(owner, b);
-        }
 
         public static (int start, int length) NextGroup(this string str, int startIndex = 0)
         {
@@ -1123,8 +1080,7 @@ namespace UtilClasses.Extensions.Strings
             return (-1, 0);
         }
 
-        private static readonly List<(char, char)> _matchingPairs = new List<(char, char)>
-            { ('{', '}'), ('[', ']'), ('(', ')') };
+        private static readonly List<(char, char)> _matchingPairs = [('{', '}'), ('[', ']'), ('(', ')')];
 
         private static char GetMatchingChar(char c)
         {

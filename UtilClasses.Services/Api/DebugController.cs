@@ -48,6 +48,8 @@ public class DebugController : Controller
             var c =( endpoint.DisplayName??"huh").SubstringAfter("Api.").SubstringBefore(".", out var rest)
                 .RemoveAllOic("Controller");
             var action = rest.SubstringBefore(" (").SubstringAfter(".");
+            if (null == action || null ==c)
+                continue;
             dict.GetOrAdd(c).Add(action);
         }
 
@@ -139,7 +141,7 @@ public class DebugController : Controller
         sb.AppendLines($"public static class {name}Routes", "{")
             .Indent()
             //.AppendObjects(routes, t => $"public const string {t.Controller}_{t.Action} = \"{t.Controller}/{t.Action}\"")
-            .AppendObjects(routes, r => $"public const string {r.ReplaceOic("/", "_")} = \"{r}\";")
+            .AppendObjects(routes, r => $"public const string {r?.ReplaceOic("/", "_")} = \"{r}\";")
             .Outdent()
             .Append("}");
 

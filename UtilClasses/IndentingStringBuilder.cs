@@ -690,7 +690,7 @@ namespace UtilClasses
         private static FunctionBuilder FromLine(string line)
         {
             var ret = new FunctionBuilder();
-            var parts = line?.SplitREE(" ") ?? new string[] { };
+            var parts = line?.SplitRemoveEmptyEntries(" ") ?? new string[] { };
             if (parts.Count() == 1)
                 ret.Name = parts[0];
             if (parts.Count() == 2)
