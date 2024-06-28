@@ -39,10 +39,10 @@ namespace UtilClasses.Services
         {
             var cfg = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
-                .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.File(logDir ?? "", fileSizeLimitBytes: 0xA00000L, rollOnFileSizeLimit: true,
+                .WriteTo.Console();
+            if (logDir.IsNotNullOrEmpty())
+                cfg.WriteTo.File(logDir ?? "", fileSizeLimitBytes: 0xA00000L, rollOnFileSizeLimit: true,
                     retainedFileCountLimit: 20);
             setup?.Invoke(cfg);
 
