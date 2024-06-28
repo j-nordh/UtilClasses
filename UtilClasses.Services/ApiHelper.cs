@@ -18,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Core;
 using UtilClasses.Extensions.Enumerables;
+using UtilClasses.Extensions.Lists;
 using UtilClasses.Interfaces;
 using UtilClasses.Json;
 
@@ -39,7 +40,8 @@ public class ApiHelper
     private Action<FirstChanceExceptionEventArgs>? _onException;
     private Action<WebApplication>? _onStarting;
     private WebApplicationBuilder? _builder;
-    private Action<LoggerConfiguration>? _logConfig;
+
+    private List<Action<LoggerConfiguration>?> _logConfigs = new();
 
     public ApiHelper(string name)
     {
@@ -95,8 +97,10 @@ public class ApiHelper
 
     public void WithLogFilter<T>() where T : ILogEventFilter, new()
     {
-        _logConfig = cfg => cfg.Filter.With<T>();
+        _logConfigs.Add(cfg => cfg.Filter.With<T>());
     }
+
+    public void AddConsoleLog() => _logConfigs.Add(cfg => cfg.WriteTo.Console());
 
 
     protected virtual async Task RunConfigureServices(WebApplicationBuilder builder)
@@ -146,7 +150,7 @@ public class ApiHelper
 
 
         Helper.SetupDefaultConfig(_builder);
-        Helper.SetupLogging(_builder, "", _logConfig);
+        Helper.SetupLogging(_builder, "", cfg => _logConfigs.ForEach(a => a?.Invoke(cfg)), false);
         LoadStuff(_builder);
 
         Log.Logger.Information("---------------------------------------------");

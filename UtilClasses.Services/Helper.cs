@@ -35,12 +35,13 @@ namespace UtilClasses.Services
         }
 
         public static void SetupLogging(WebApplicationBuilder builder, string logDir,
-            Action<LoggerConfiguration>? setup = null)
+            Action<LoggerConfiguration>? setup = null, bool addConsoleLogger = true)
         {
             var cfg = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
-                .Enrich.FromLogContext()
-                .WriteTo.Console();
+                .Enrich.FromLogContext();
+            if(addConsoleLogger)
+                cfg.WriteTo.Console();
             if (logDir.IsNotNullOrEmpty())
                 cfg.WriteTo.File(logDir ?? "", fileSizeLimitBytes: 0xA00000L, rollOnFileSizeLimit: true,
                     retainedFileCountLimit: 20);
