@@ -31,6 +31,7 @@ public class ApiHelper
     public int Port { get; set; } = -1;
 
     public bool? RunAsService { get; set; }
+    public bool GenerateLandingPage { get; set; } = true;
 
     private Action<IServiceCollection>? _configureServices;
     private Func<IServiceCollection, Task>? _configureServicesAsync;
@@ -85,7 +86,7 @@ public class ApiHelper
             .NotNull()
             .ToList();
     }
-    
+
     public void OnConfigureServices(Action<IServiceCollection> a) => _configureServices = a;
     public void OnConfigureServices(Func<IServiceCollection, Task> f) => _configureServicesAsync = f;
     public void OnStarting(Action<WebApplication> a) => _onStarting = a;
@@ -186,12 +187,15 @@ public class ApiHelper
 
         App.UseDefaultFiles();
         //App.UseStaticFiles();
-        App.MapGet("/",
-            async context =>
-            {
-                await context.Response.WriteAsync(
-                    "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
-            });
+        if (GenerateLandingPage)
+            App.MapGet("/",
+                async context =>
+                {
+                    await context.Response.WriteAsync(
+                        $"Congratulations, you have reached {Name}. If you're trying to reach the API specify the correct endpoint or try /api/Swagger or /Swagger instead. Have a nice day!");
+                });
+
+
         App.UseExceptionHandler("/error");
         App.MapControllerRoute(name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -199,7 +203,6 @@ public class ApiHelper
         App.UseSwagger();
         App.UseSwaggerUI(opt =>
             opt.EnableTryItOutByDefault());
-
         if (null != _onException)
         {
             AppDomain.CurrentDomain.FirstChanceException += OnFirstChanceException;
