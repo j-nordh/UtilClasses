@@ -13,9 +13,9 @@ namespace UtilClasses.Extensions.Assemblies
 {
     public static class AssemblyExtensions
     {
-        public static string GetResourceString(this Assembly ass, string name) => ass.GetResourceStream(name).AsString();
+        public static string? GetResourceString(this Assembly ass, string name) => ass.GetResourceStream(name)?.AsString();
 
-        public static Stream GetResourceStream(this Assembly ass, string name)
+        public static Stream? GetResourceStream(this Assembly ass, string name, bool recursive = true)
         {
             if (null == name) return null;
 
@@ -27,6 +27,13 @@ namespace UtilClasses.Extensions.Assemblies
             }
             var dir = new DirectoryInfo(Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(ass.CodeBase).Path))!);
             var files = dir.EnumerateFiles().Where(fi => fi.Name.ContainsOic(name)).ToList();
+            if (recursive && !files.Any())
+            {
+                //Try sub directories
+                files = dir.GetFileSystemInfos("*", SearchOption.AllDirectories)
+                    .OfType<FileInfo>()
+                    .Where(fi => fi.Name.ContainsOic(name)).ToList();
+            }
             if (!files.Any()) throw new KeyNotFoundException();
             if (files.Count > 1) throw new DuplicateNameException();
             return File.OpenRead(files.Single().FullName);

@@ -159,6 +159,15 @@ namespace UtilClasses.Extensions.Dictionaries
             return dict;
         }
 
+        public static TVal GetOrThrow<TKey, TVal>(this Dictionary<TKey, TVal> dict, TKey key, Action thrower)
+        {
+            TVal res;
+            if (dict.TryGetValue(key, out res)) return res;
+            thrower();
+            return res;
+        }
+
+
         public static TVal GetOrAdd<TKey, TVal>(this IDictionary<TKey, TVal> dict, TKey key, Func<TVal> addFunc)
         {
             TVal res;
@@ -168,13 +177,6 @@ namespace UtilClasses.Extensions.Dictionaries
             return res;
         }
 
-        public static TVal GetOrThrow<TKey, TVal>(this Dictionary<TKey, TVal> dict, TKey key, Action thrower)
-        {
-           TVal res;
-            if (dict.TryGetValue(key, out res)) return res;
-            thrower();
-            return res;
-        }
 
         public static TVal GetOrAdd<TKey, TVal>(this IDictionary<TKey, TVal> dict, TKey key, Func<TKey, TVal> addFunc)
         {

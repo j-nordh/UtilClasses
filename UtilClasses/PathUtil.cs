@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using UtilClasses.Extensions.Strings;
@@ -19,21 +20,31 @@ namespace UtilClasses
             _basePath = basePath;
         }
 
-        public PathUtil(Assembly ass) : this(ass.Location)
+        public static PathUtil FromAssembly(Assembly ass)
+            => new PathUtil(Path.GetDirectoryName(ass.Location));
+        public static PathUtil FromType<T>(params string[] subDirParts)
         {
+            var path = Path.GetDirectoryName(typeof(T).Assembly.Location);
+            if (subDirParts.Any())
+                path = StaticPathUtil.Combine(path, subDirParts);
+            return new PathUtil(path);
         }
 
-        public string GetRelativePath(string path) => PathUtil2.GetAbsolutePath(path, _basePath);
-        public string GetAbsolutePath(string path) => PathUtil2.GetAbsolutePath(path, _basePath);
+        public string GetRelativePath(string path) => StaticPathUtil.GetRelativePath(path, _basePath);
+        public string GetAbsolutePath(string path) => StaticPathUtil.GetAbsolutePath(path, _basePath);
 
         public static string GetRelativePath(string fullPath, string basePath)
-            => PathUtil2.GetRelativePath(fullPath, basePath);
+            => StaticPathUtil.GetRelativePath(fullPath, basePath);
 
         public static string GetAbsolutePath(string relPath, string basePath) =>
-            PathUtil2.GetAbsolutePath(relPath, basePath);
+            StaticPathUtil.GetAbsolutePath(relPath, basePath);
+
+        public  string Combine(string first, params string[] parts) => StaticPathUtil.Combine(new[] { _basePath, first }.Union(parts).ToArray());
+        public string Combine(params string[] parts) => StaticPathUtil.Combine(new[] { _basePath }.Union(parts).ToArray());
+
     }
 
-    public static class PathUtil2
+    public static class StaticPathUtil
     {
         public static string GetRelativePath(string fullPath, string? basePath = null)
         {
@@ -65,7 +76,7 @@ namespace UtilClasses
         private static string GetBasePath(string? basePath)
         {
             basePath ??= Environment.CurrentDirectory;
-            
+
             if (File.Exists(basePath))
                 basePath = Path.GetDirectoryName(basePath);
             if (null == basePath)
@@ -75,6 +86,18 @@ namespace UtilClasses
                 throw new NullReferenceException(
                     "The supplied base path is not rooted, meaning it cannot be used...");
             return basePath;
+        }
+        public static string Combine(string first, params string[] parts) => Combine(new[] { first }.Union(parts).ToArray());
+        public static string Combine(params string[] parts)
+        {
+            if (!parts.Any())
+                return "";
+            var path = parts.First();
+            foreach (var part in parts.Skip(1))
+            {
+                path = Path.Combine(path, part);
+            }
+            return path;
         }
     }
 }
