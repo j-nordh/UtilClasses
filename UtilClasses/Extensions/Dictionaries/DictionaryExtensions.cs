@@ -21,12 +21,6 @@ namespace UtilClasses.Extensions.Dictionaries
             return IsSetAnd(dict, key, x => x > 0);
         }
 
-        [Obsolete("Use ToDictionaryOic instead.")]
-        public static DictionaryOic<TElement> ToCaseInsensitiveDictionary<TSource, TElement>(
-            this IEnumerable<TSource> source, Func<TSource, string> keySelector,
-            Func<TSource, TElement> elementSelector) where TElement : class
-            => ToDictionaryOic(source, keySelector, elementSelector);
-
         public static DictionaryOic<TElement> ToDictionaryOic<TSource, TElement>(
             this IEnumerable<TSource> source, Func<TSource, string> keySelector, Func<TSource, TElement> elementSelector)
         {
@@ -37,10 +31,6 @@ namespace UtilClasses.Extensions.Dictionaries
             }
             return dict;
         }
-        [Obsolete("Use ToDictionaryOic instead.")]
-        public static DictionaryOic<T> ToCaseInsensitiveDictionary<T>(
-            this IEnumerable<T> source, Func<T, string> keySelector) where T : class =>
-            source.ToDictionaryOic(keySelector, x => x);
 
         public static DictionaryOic<T> ToDictionaryOic<T>(
             this IEnumerable<KeyValuePair<string, T>> source) =>
@@ -49,10 +39,6 @@ namespace UtilClasses.Extensions.Dictionaries
             this IEnumerable<T> source, Func<T, string> keySelector) where T : class =>
             source.ToDictionaryOic(keySelector, x => x);
 
-        [Obsolete("Use ToDictionaryOic instead.")]
-        public static DictionaryOic<TElement> ToCaseInsensitiveDictionary<TElement>(
-            this IDictionary<string, TElement> source) where TElement : class
-            => source.ToDictionaryOic();
         public static DictionaryOic<TElement> ToDictionaryOic<TElement>(
             this IDictionary<string, TElement> source) where TElement : class
         {
@@ -302,7 +288,7 @@ namespace UtilClasses.Extensions.Dictionaries
             return dict;
         }
 
-        public static IEnumerable<TVal> Select<TKey, TVal>(this IEnumerable<TKey> keys, Dictionary<TKey, TVal> dict) =>
+        public static IEnumerable<TVal> LookupFrom<TKey, TVal>(this IEnumerable<TKey> keys, Dictionary<TKey, TVal> dict) =>
             keys.Select(k => dict[k]);
 
         public static IDictionary<TKey, string> RemoveValue<TKey>(this IDictionary<TKey, string> dict, string val,

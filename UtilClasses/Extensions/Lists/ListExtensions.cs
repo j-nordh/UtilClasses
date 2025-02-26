@@ -37,6 +37,11 @@ namespace UtilClasses.Extensions.Lists
             lst.AddRange(items);
         }
 
+        public static void AddRanges<T>(this List<T> lst, params IEnumerable<T>[] ranges)
+        {
+            foreach(var range in ranges)
+                lst.AddRange(range);
+        }
         public static void AddRange<T>(this List<T> lst, params (bool predicate, T value)[] tuples) =>
             lst.AddRange(tuples.Where(t => t.predicate).Select(t => t.value));
         public static void AddRange<T>(this List<T> lst, bool predicate, params T[] values)

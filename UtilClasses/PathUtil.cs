@@ -13,11 +13,11 @@ namespace UtilClasses
 {
     public class PathUtil
     {
-        private readonly string _basePath;
+        public string BasePath { get; }
 
-        public PathUtil(string basePath)
+        public PathUtil(params string[] basePath)
         {
-            _basePath = basePath;
+            BasePath = StaticPathUtil.Combine(basePath);
         }
 
         public static PathUtil FromAssembly(Assembly ass)
@@ -30,8 +30,8 @@ namespace UtilClasses
             return new PathUtil(path);
         }
 
-        public string GetRelativePath(string path) => StaticPathUtil.GetRelativePath(path, _basePath);
-        public string GetAbsolutePath(string path) => StaticPathUtil.GetAbsolutePath(path, _basePath);
+        public string GetRelativePath(string path) => StaticPathUtil.GetRelativePath(path, BasePath);
+        public string GetAbsolutePath(string path) => StaticPathUtil.GetAbsolutePath(path, BasePath);
 
         public static string GetRelativePath(string fullPath, string basePath)
             => StaticPathUtil.GetRelativePath(fullPath, basePath);
@@ -39,8 +39,8 @@ namespace UtilClasses
         public static string GetAbsolutePath(string relPath, string basePath) =>
             StaticPathUtil.GetAbsolutePath(relPath, basePath);
 
-        public  string Combine(string first, params string[] parts) => StaticPathUtil.Combine(new[] { _basePath, first }.Union(parts).ToArray());
-        public string Combine(params string[] parts) => StaticPathUtil.Combine(new[] { _basePath }.Union(parts).ToArray());
+        public  string Combine(string first, params string[] parts) => StaticPathUtil.Combine(new[] { BasePath, first }.Union(parts).ToArray());
+        public string Combine(params string[] parts) => StaticPathUtil.Combine(new[] { BasePath }.Union(parts).ToArray());
 
     }
 

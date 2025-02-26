@@ -87,7 +87,7 @@ namespace UtilClasses.MathClasses
             if (parts.Any()) // the expression can be split into separate parts before parsing
             {
                 var parsed = parts.Select(Parse);
-                //var expressions = parsed.Select(p => new ExpressionPart(p)).ToList();
+                //var expressions = parsed.LookupFrom(p => new ExpressionPart(p)).ToList();
                 var chained = parsed.Chain();
                 return chained;
             }
