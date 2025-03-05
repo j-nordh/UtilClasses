@@ -20,12 +20,17 @@ namespace UtilClasses.Extensions.Assemblies
             if (null == name) return null;
 
             var names = ass.GetManifestResourceNames().Where(n => n.ContainsOic(name)).ToList();
-            if (names.Any())
-            {
-                if (names.Count > 1) throw new DuplicateNameException();
-                return ass.GetManifestResourceStream(names[0]);
-            }
-            var dir = new DirectoryInfo(Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(ass.CodeBase).Path))!);
+            
+            if (!names.Any()) 
+                return File.OpenRead(ass.GetResourcePath(name, recursive));
+            
+            if (names.Count > 1) throw new DuplicateNameException();
+            return ass.GetManifestResourceStream(names.Single());
+        }
+
+        public static string GetResourcePath(this Assembly ass, string name, bool recursive = true)
+        {
+            var dir = new DirectoryInfo(Path.GetDirectoryName(ass.Location)!);
             var files = dir.EnumerateFiles().Where(fi => fi.Name.ContainsOic(name)).ToList();
             if (recursive && !files.Any())
             {
@@ -36,7 +41,7 @@ namespace UtilClasses.Extensions.Assemblies
             }
             if (!files.Any()) throw new KeyNotFoundException();
             if (files.Count > 1) throw new DuplicateNameException();
-            return File.OpenRead(files.Single().FullName);
+            return files.Single().FullName;
         }
 
         public static void SaveResource(this Assembly ass, string name, string content, Encoding? enc = null)

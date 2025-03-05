@@ -584,6 +584,19 @@ namespace UtilClasses.Extensions.Enumerables
             items.Where(i => !filter.Contains(i));
         public static IEnumerable<T> Except<T, T2>(this IEnumerable<T> items, IDictionary<T, T2>  filter)=>
             items.Where(i => !filter.ContainsKey(i));
+
+        public static IEnumerable<TVal> LookupFrom<TKey, TVal>(this IEnumerable<TKey> keys, Dictionary<TKey, TVal> dict) =>
+            keys.Select(k => dict[k]);
+
+        //public static IEnumerable<TVal> LookupFrom<TVal>(this IEnumerable<string> keys, List<TVal> vals,
+        //    Func<TVal, string> getKey = null)
+        //=> keys.LookupFrom(vals, getk)
+        public static IEnumerable<TVal> LookupFrom<TKey, TVal>(this IEnumerable<TKey> keys, List<TVal> vals,
+            Func<TVal, TKey> getKey, IComparer<TKey> cmp)
+            => keys.Select(k => vals.First(v => cmp.Compare(k, getKey(v))==0));
+
+
+
     }
 
     public static class Enumerable<T> where T : IComparable
@@ -598,8 +611,7 @@ namespace UtilClasses.Extensions.Enumerables
             }
         }
     }
+    
 
 
-
-
-}
+    }

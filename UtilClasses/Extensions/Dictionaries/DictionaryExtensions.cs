@@ -288,9 +288,6 @@ namespace UtilClasses.Extensions.Dictionaries
             return dict;
         }
 
-        public static IEnumerable<TVal> LookupFrom<TKey, TVal>(this IEnumerable<TKey> keys, Dictionary<TKey, TVal> dict) =>
-            keys.Select(k => dict[k]);
-
         public static IDictionary<TKey, string> RemoveValue<TKey>(this IDictionary<TKey, string> dict, string val,
             StringComparison comp = StringComparison.OrdinalIgnoreCase) =>
             dict.RemoveValue(val, comp.ToEqualityComparer());

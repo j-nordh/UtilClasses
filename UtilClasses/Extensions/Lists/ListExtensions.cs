@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UtilClasses.Extensions.Lists
 {
@@ -214,6 +210,15 @@ namespace UtilClasses.Extensions.Lists
             lst.EnsureLength(index + 1);
             lst[index] = val;
             return lst;
+        }
+
+        public static void PerformAndClear<T>(this List<T?> lst, Action<T> action)
+        {
+            foreach (var o in lst)
+            {
+                action(o);
+            }
+            lst.Clear();
         }
     }
 }
