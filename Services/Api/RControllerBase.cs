@@ -1,29 +1,34 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using UtilClasses.Interfaces;
 
 namespace UtilClasses.Services.Api;
 
-public abstract class RControllerBase<TKey, T> : Controller where   T : class
+public abstract class RControllerBase<TKey, T> : Controller where T : class, IHasId<TKey>
 {
-    protected readonly IManager<TKey, T> _man;
+    private readonly IAsyncRRepository<TKey, T> _man;
 
-    protected RControllerBase (IManager<TKey, T> man)
+    protected RControllerBase(IAsyncRRepository<TKey, T> man)
     {
         _man = man;
     }
     [Route("")]
     [HttpGet]
     [SwaggerOperation("Returns all stored objects")]
-    public virtual List<T> Read() => _man.Get();
+    public virtual async Task<List<T>> Read() => await _man.Get();
     [Route("{id}")]
     [HttpGet]
     [SwaggerOperation("Returns a single object as specified by the supplied Id")]
-    public virtual ActionResult<T> Read(TKey id) =>
-        _man.MaybeGet(id, out var ret)
-            ? new OkObjectResult(ret)
+    public virtual async Task<ActionResult<T>> Read(TKey id)
+    {
+        var o = await _man.Get(id);
+
+        return o != null
+            ? new OkObjectResult(o)
             : new NotFoundResult();
+    }
 
     [Route("Refresh")]
     [HttpPost]

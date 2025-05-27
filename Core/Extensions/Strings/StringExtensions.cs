@@ -74,8 +74,8 @@ public static class StringExtensions
         return string.IsNullOrWhiteSpace(s);
     }
 
-    public static string CrLf(this string s) => s.RemoveAll("\r").Replace("\n", "\r\n");
-    public static string Lf(this string s) => s.RemoveAll("\r");
+    public static string? CrLf(this string s) => s.RemoveAll("\r")?.Replace("\n", "\r\n");
+    public static string? Lf(this string s) => s.RemoveAll("\r");
 
     /// <summary>
     /// A nicer way of calling <see cref="System.String.Format(string, object[])"/>
@@ -296,15 +296,15 @@ public static class StringExtensions
         return sb.ToString();
     }
 
-    public static string RemoveAll(this string s, params string[] needles) =>
-        needles.Aggregate(s, (current, n) => current.Replace(n, ""));
+    public static string? RemoveAll(this string? s, params string[] needles) =>
+        needles.Aggregate(s, (current, n) => current?.Replace(n, ""));
 
     public static string? RemoveAllOic(this string? s, params string[] needles) =>
         null == s
             ? null
             : needles.Aggregate(s, (current, n) => current.ReplaceOic(n, ""));
 
-    public static string RemoveAllWhitespace(this string s)
+    public static string? RemoveAllWhitespace(this string s)
         => s.RemoveAll(" ", "\t", "\r", "\n", Convert.ToChar(160).AsString());
 
     public static string RemoveEndOic(this string s, string end) =>
@@ -501,10 +501,10 @@ public static class StringExtensions
 
 
     public static string? SubstringBefore(this string? str, char needle) =>
-        SubstringBefore(str, new[] { $"{needle}" }, out _);
+        SubstringBefore(str, [$"{needle}"], out _);
 
     public static string? SubstringBefore(this string? str, string needle) =>
-        SubstringBefore(str, new[] { needle }, out _);
+        SubstringBefore(str, [needle], out _);
 
     public static string? SubstringBeforeLast(this string? str, string needle,
         StringComparison sc = StringComparison.OrdinalIgnoreCase)
@@ -528,6 +528,37 @@ public static class StringExtensions
         start += before.Length;
         return str.Substring(start, end - start);
     }
+    public static bool TrySubstringBetween(this string str, string before, string after, out string result, out int indexAfter,
+        StringComparison sc = StringComparison.OrdinalIgnoreCase)
+    {
+        result = "";
+        var start = str.IndexOf(before, sc);
+        indexAfter = str.IndexOf(after, start + 1, sc);
+        if (start == -1) return false;
+        if (indexAfter == -1)return false;
+        start += before.Length;
+        result = str.Substring(start, indexAfter - start);
+        indexAfter++;
+        return true;
+    }
+    public static List<string> ExtractTags(this string? str, string startMarker, string endMarker,
+        StringComparison sc = StringComparison.OrdinalIgnoreCase)
+    {
+        var left = str;
+        var lst = new List<string>();
+        if (str.IsNullOrEmpty())
+            return lst;
+
+        while (left!.TrySubstringBetween(startMarker, endMarker, out str, out int end))
+        {
+            lst.Add(str);
+            left = left.Substring(end);
+        }
+
+        return lst;
+    }
+
+
 
     public static string? SubstringBefore(this string? str, char needle, out string? rest,
         bool keepMarker = true) =>

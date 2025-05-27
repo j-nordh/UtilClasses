@@ -170,6 +170,8 @@ public class BitStream : IEquatable<BitStream>
     public int GetBufferIndex(int i)
     {
         var byteIndex = i / 8;
+        if (_bits == null)
+            throw new NullReferenceException("There is no bit buffer!");
         switch (FirstBit)
         {
             case FirstBitLocation.LastByteFirstBit:
@@ -223,24 +225,28 @@ public class BitStream : IEquatable<BitStream>
 
     public byte[] GetBytes(bool truncate = false)
     {
-        int byteCount;
         byte[] ret;
+        if (_bits == null)
+            throw new NullReferenceException("There is no bit buffer");
+
         if (truncate)
         {
-            var actualBits = FirstBit > 0
-                ? WritePosition
-                : _bits.Length - WritePosition;
-            byteCount = (int)Math.Ceiling(actualBits / 8.0);
-            var tmpRead = ReadPosition;
-            var tmpWrite = WritePosition;
-            ReadPosition = FirstBit > 0 ? 0 : _bits.Length;
-            WritePosition = _bits.Length - ReadPosition;
-            ret = ReadBytes(actualBits);
-            ReadPosition = tmpRead;
-            WritePosition = tmpWrite;
+            
+                var actualBits = FirstBit > 0
+                    ? WritePosition
+                    : _bits.Length - WritePosition;
+                var tmpRead = ReadPosition;
+                var tmpWrite = WritePosition;
+                ReadPosition = FirstBit > 0 ? 0 : _bits.Length;
+                WritePosition = _bits.Length - ReadPosition;
+                ret = ReadBytes(actualBits);
+                ReadPosition = tmpRead;
+                WritePosition = tmpWrite;
+            
+
             return ret;
         }
-        byteCount = (int)Math.Ceiling(_bits.Length / 8.0);
+        var byteCount = (int)Math.Ceiling(_bits.Length / 8.0);
         ret = new byte[byteCount];
         _bits.CopyTo(ret, 0);
         return ret;
@@ -275,7 +281,7 @@ public class BitStream : IEquatable<BitStream>
 
     public void Clear()
     {
-        _bits.SetAll(false);
+        _bits?.SetAll(false);
         ResetReadPos();
         ResetWritePos();
     }
@@ -292,7 +298,7 @@ public class BitStream : IEquatable<BitStream>
 
     protected string ReadString(Func<byte[], string> resolver, int bitsPerChar, int length, bool endOnNull)
     {
-        if (length * bitsPerChar > _bits.Length && !endOnNull)
+        if (length * bitsPerChar > _bits?.Length && !endOnNull)
             throw new ArgumentException(
                 "You want to read more characters than the buffer contains and won't end on null. Are you mad?");
         var bytes = endOnNull
@@ -317,10 +323,14 @@ public class BitStream : IEquatable<BitStream>
     }
 
 
-    public bool Equals(BitStream other)
+    public bool Equals(BitStream? other)
     {
         if (null == other) return false;
         if (FirstBit != other.FirstBit) return false;
+        if (_bits == null)
+            return other._bits == null;
+        if (other._bits == null)
+            return false;
         if (_bits.Length != other._bits.Length) return false;
         for (int i = 0; i < _bits.Length; i++)
         {

@@ -6,9 +6,9 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\UtilClasses.Dto\UtilClasses.Dto.csproj" />
-		<ProjectReference Include="..\UtilClasses.Json\UtilClasses.Json.csproj" />
-		<ProjectReference Include="..\UtilClasses\UtilClasses.csproj" />
+		<ProjectReference Include="..\Dto\UtilClasses.Dto.csproj" />
+		<ProjectReference Include="..\Json\UtilClasses.Json.csproj" />
+		<ProjectReference Include="..\Core\UtilClasses.Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />

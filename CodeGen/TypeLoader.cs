@@ -6,9 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using UtilClasses.Extensions.Dictionaries;
-using UtilClasses.Extensions.Enumerables;
-using UtilClasses.Extensions.Strings;
+using UtilClasses.Core.Extensions.Enumerables;
+using UtilClasses.Core.Extensions.Strings;
 
 namespace UtilClasses.CodeGen
 {

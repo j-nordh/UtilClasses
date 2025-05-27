@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using UtilClasses.Extensions.Enums;
+using UtilClasses.Core.Extensions.Enums;
 
 namespace UtilClasses.Winforms
 {

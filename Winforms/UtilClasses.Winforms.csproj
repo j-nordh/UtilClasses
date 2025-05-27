@@ -250,12 +250,9 @@
     <None Include="Save.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common.Dto\Common.Dto.csproj">
-      <Project>{D17E1FDE-755C-4366-9A19-235C0C4B959F}</Project>
-      <Name>Common.Dto</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UtilClasses\UtilClasses.csproj">
-      <Name>UtilClasses</Name>
+    <ProjectReference Include="..\Core\UtilClasses.Core.csproj">
+      <Project>{3bba3150-e309-4a51-81f9-42b8f4f99a6b}</Project>
+      <Name>UtilClasses.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

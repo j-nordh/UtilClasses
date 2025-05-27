@@ -7,9 +7,10 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using UtilClasses.Extensions.Enumerables;
-using UtilClasses.Extensions.Objects;
-using UtilClasses.Extensions.Strings;
+using UtilClasses.Core;
+using UtilClasses.Core.Extensions.Enumerables;
+using UtilClasses.Core.Extensions.Objects;
+using UtilClasses.Core.Extensions.Strings;
 using Uri = System.Uri;
 
 namespace UtilClasses.WebClient

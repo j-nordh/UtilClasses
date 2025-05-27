@@ -6,9 +6,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using UtilClasses.Extensions.Integers;
-using UtilClasses.Extensions.Objects;
-using UtilClasses.Extensions.Strings;
+using UtilClasses.Core.Extensions.Objects;
+using UtilClasses.Core.Extensions.Integers;
+using UtilClasses.Core.Extensions.Strings;
 
 namespace UtilClasses.Winforms
 {

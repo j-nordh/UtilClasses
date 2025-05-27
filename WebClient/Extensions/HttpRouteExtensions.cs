@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using UtilClasses.Extensions.Objects;
-using UtilClasses.Extensions.Strings;
+using UtilClasses.Core.Extensions.Objects;
+using UtilClasses.Core.Extensions.Strings;
 
 namespace UtilClasses.WebClient.Extensions
 {

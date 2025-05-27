@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UtilClasses.Extensions.Dictionaries;
-using UtilClasses.Extensions.Strings;
+using UtilClasses.Core.Extensions.Dictionaries;
+using UtilClasses.Core.Extensions.Strings;
 using UtilClasses.WebClient.Extensions;
 
 namespace UtilClasses.WebClient

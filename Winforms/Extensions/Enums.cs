@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using UtilClasses.Extensions.Enums;
+using UtilClasses.Core.Extensions.Enums;
 
 namespace UtilClasses.Winforms.Extensions
 {

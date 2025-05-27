@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
-using UtilClasses.Extensions.Objects;
+using UtilClasses.Core.Extensions.Objects;
+using UtilClasses.Core.Extensions.Objects;
 
 namespace UtilClasses.Winforms
 {

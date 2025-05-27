@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using UtilClasses.Extensions.Strings;
+using UtilClasses.Core.Extensions.Strings;
 
 namespace UtilClasses.Winforms.Extensions
 {

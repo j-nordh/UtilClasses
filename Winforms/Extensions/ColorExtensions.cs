@@ -4,8 +4,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UtilClasses.Extensions.Enums;
-using UtilClasses.Extensions.Strings;
+using UtilClasses.Core.Extensions.Enums;
+using UtilClasses.Core.Extensions.Strings;
 using Color = System.Drawing.Color;
 
 namespace UtilClasses.Winforms.Extensions

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using UtilClasses.Extensions.Enumerables;
+using UtilClasses.Core.Extensions.Enumerables;
 using UtilClasses.Winforms.Extensions;
 
 namespace UtilClasses.Winforms

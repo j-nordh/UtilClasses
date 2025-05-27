@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 
 namespace UtilClasses.Interfaces;
 
-public interface IAsyncRepository;
+public interface IAsyncRepository
+{
+    Task Refresh();
+};
 
 public interface IAsyncRRepository<T> : IAsyncRepository
 {
@@ -25,12 +28,12 @@ public interface IAsyncCruRepository<TKey, T> : IAsyncRRepository<TKey, T>
     event Action<T> Updated;
     Task<TKey> Add(T o);
     Task<List<TKey>> Add(IEnumerable<T> o);
-    Task Put(TKey id, T g);
+    Task<bool> Put(TKey id, T g);
 }
 
 public interface IAsyncCrudRepository<TKey, T> : IAsyncCruRepository<TKey, T>
 {
     event Action<TKey> Deleted;
-    Task Delete(TKey id);
-    
+    Task<bool> Delete(TKey id);
+
 }

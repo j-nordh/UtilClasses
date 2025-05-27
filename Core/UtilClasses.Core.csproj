@@ -15,6 +15,7 @@
 		<None Remove="Resources\LastNames.txt" />
 		<None Remove="Resources\Nouns.txt" />
 		<None Remove="Resources\Places.txt" />
+		<None Remove="Resources\Prepositions.txt" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -26,6 +27,7 @@
 		<None Remove="Resources\CompanyTypes.txt" />
 		<EmbeddedResource Include="Resources\CompanyTypes.txt" />
 		<None Remove="Resources\RoadNames.txt" />
+		<EmbeddedResource Include="Resources\Prepositions.txt" />
 		<EmbeddedResource Include="Resources\RoadNames.txt" />
 		<None Remove="Resources\Cities.txt" />
 		<EmbeddedResource Include="Resources\Cities.txt" />

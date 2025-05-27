@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using UtilClasses.Extensions.Funcs;
-using UtilClasses.Extensions.Enumerables;
+using UtilClasses.Core.Extensions.Funcs;
+using UtilClasses.Core.Extensions.Enumerables;
 
 namespace UtilClasses.Winforms.Extensions
 {

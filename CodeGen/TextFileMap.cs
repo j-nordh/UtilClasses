@@ -7,11 +7,12 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using SupplyChain.Dto;
-using UtilClasses.Extensions.Dictionaries;
-using UtilClasses.Extensions.Enumerables;
-using UtilClasses.Extensions.Objects;
-using UtilClasses.Extensions.Strings;
-using UtilClasses.Files;
+using UtilClasses.Core;
+using UtilClasses.Core.Extensions.Dictionaries;
+using UtilClasses.Core.Extensions.Enumerables;
+using UtilClasses.Core.Extensions.Objects;
+using UtilClasses.Core.Extensions.Strings;
+using UtilClasses.Core.Files;
 
 namespace UtilClasses.CodeGen
 {

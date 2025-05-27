@@ -10,6 +10,7 @@ namespace UtilClasses.Core;
 
 public class IdGenerator
 {
+    
     private ulong _count = 1;
     public long Long() => (long)_count++;
     private Random _rnd = new();
@@ -23,6 +24,7 @@ public class IdGenerator
     public static List<string> Cities { get; }
     public static List<string> Countries { get; }
     public static List<(string Name, decimal Latitude, decimal Longitude)> Places { get; }
+    public static List<string> Prepositions { get; }
     private readonly List<string> _nouns;
     private readonly List<string> _adjectives;
     private readonly List<string> _firstNames;
@@ -44,6 +46,7 @@ public class IdGenerator
         CompanyTypes = LoadList("CompanyTypes.txt");
         RoadNames = LoadList("RoadNames.txt");
         Cities = LoadList("Cities.txt");
+        Prepositions = LoadList("Prepositions.txt");
         Countries = LoadList("Countries.txt");
 
         Places = ass.GetResourceString("Places.txt")
@@ -76,6 +79,7 @@ public class IdGenerator
         public string Name() =>
             $"{Get(FirstNames)} {Get(LastNames)}";
 
+        public string FirstName() => Get(FirstNames);
         public string CompanyName()
             => $"{Get(Adjectives)} {Get(Nouns)} {Get(CompanyTypes)}";
 
@@ -85,6 +89,17 @@ public class IdGenerator
         public string Place() => $"{_rnd.Next(10000, 99999)}";
         public string City() =>  Get(Cities);
         public string Country() => Get(Countries);
+
+        public string Path(int steps = 3, string separator="/")
+        {
+            var lst = new List<string>();
+            for (int i = 0; i < steps - 1; i++)
+            {
+                lst.Add(Get(Prepositions));
+            }
+            lst.Add(Noun());
+            return lst.Join(separator);
+        }
 
         private string Get(List<string> ls) => ls[_rnd.Next(0, ls.Count)];
 

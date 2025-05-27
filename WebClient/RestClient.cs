@@ -5,9 +5,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using UtilClasses.Extensions.Strings;
+using UtilClasses.Core.Extensions.Strings;
 using UtilClasses.Json;
 using Microsoft.AspNetCore.Http.Extensions;
+using UtilClasses.Core;
+
 namespace UtilClasses.WebClient;
 
 public class RestClient
