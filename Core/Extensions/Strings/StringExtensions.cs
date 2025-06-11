@@ -1138,4 +1138,6 @@ public static class StringExtensions
 
         return -1;
     }
+
+    public static Encoding OrUtf8(this Encoding? enc) => enc ?? Encoding.UTF8;
 }

@@ -71,6 +71,7 @@ public static class DictionaryExtensions
     public static TValue? Maybe<TKey, TValue>(this IDictionary<TKey, TValue?> dict, TKey key) where TValue : class 
         => dict.TryGetValue(key, out var ret) ? ret : null;
 
+
     public static TValue? Maybe<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, Action? onNull = null, RequireClass<TValue>? _ = null) where TValue : class
     {
         if (null != dict)
