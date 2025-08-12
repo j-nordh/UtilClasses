@@ -67,8 +67,8 @@ public static class DictionaryExtensions
         }
         return ret;
     }
-        
-    public static TValue? Maybe<TKey, TValue>(this IDictionary<TKey, TValue?> dict, TKey key) where TValue : class 
+
+    public static TValue? Maybe<TKey, TValue>(this IDictionary<TKey, TValue?> dict, TKey key) where TValue : class
         => dict.TryGetValue(key, out var ret) ? ret : null;
 
 
@@ -81,7 +81,7 @@ public static class DictionaryExtensions
         onNull?.Invoke();
         return null;
     }
-    public static TValue? Maybe<TKey, TValue>(this IDictionary<TKey, TValue>? dict, TKey? key, Action? onNull = null, RequireClass<TValue>? _ = null) where TValue : class where TKey : struct 
+    public static TValue? Maybe<TKey, TValue>(this IDictionary<TKey, TValue>? dict, TKey? key, Action? onNull = null, RequireClass<TValue>? _ = null) where TValue : class where TKey : struct
     {
         if (null != key && null != dict)
         {
@@ -115,7 +115,7 @@ public static class DictionaryExtensions
         if (null == dict) return def;
         return dict.TryGetValue(key, out ret) ? ret : def;
     }
-    public static TValue Maybe<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey? key, TValue def) where TKey: struct
+    public static TValue Maybe<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey? key, TValue def) where TKey : struct
     {
         TValue ret;
         if (null == key) return def;
@@ -425,6 +425,12 @@ public static class DictionaryExtensions
         if (!dict.ContainsKey(key)) return dict;
         if (dict[key].IsNullOrEmpty()) return dict;
         dict[key] = dict[key].Where(predicate).ToList();
+        return dict;
+    }
+
+    public static IDictionary<Type, string> Add<T>(this IDictionary<Type, string> dict, string value)
+    {
+        dict.Add(typeof(T), value);
         return dict;
     }
 

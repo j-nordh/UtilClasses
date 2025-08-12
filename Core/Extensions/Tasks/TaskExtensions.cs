@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UtilClasses.Core.Extensions.Enumerables;
 
@@ -72,6 +73,16 @@ public static class TaskExtensions
     public static Func<Task> AsTask(this Action a) => ()=>
     {
         a();
+        return Task.CompletedTask;
+    };
+    public static Func<CancellationToken, Task> AsTaskWithCt(this Action a) => _ =>
+    {
+        a();
+        return Task.CompletedTask;
+    };
+    public static Func<T, CancellationToken, Task> AsTaskWithCt<T>(this Action<T> a) => (o,_) =>
+    {
+        a(o);
         return Task.CompletedTask;
     };
     public static Func<T,Task> AsTask<T>(this Action<T> a) => x =>

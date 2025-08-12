@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtendedUtilClasses", "Exte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilClasses.Services", "Services\UtilClasses.Services.csproj", "{8D05BCF6-1FE7-4F58-9444-5DCBD9D56EE6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UtilClasses", "UtilClasses", "{7C784876-C881-42C8-8CE2-A4D8AAEFC3D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
