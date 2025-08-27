@@ -13,25 +13,25 @@ public class PathUtil
     {
         BasePath = StaticPathUtil.Combine(basePath);
     }
-
-    public static PathUtil FromAssembly(Assembly ass)
-        => new PathUtil(Path.GetDirectoryName(ass.Location));
-    public static PathUtil FromType<T>(params string[] subDirParts)
+    public PathUtil(string first, params string[] basePath)
     {
-        var path = Path.GetDirectoryName(typeof(T).Assembly.Location);
+        BasePath = StaticPathUtil.Combine(first, basePath);
+    }
+    public static PathUtil FromAssembly(Assembly ass, params string[] subDirParts) => new(ass.Location, subDirParts);
+
+    public static PathUtil FromType<T>(params string[] subDirParts) => FromType(typeof(T), subDirParts);
+
+    public static PathUtil FromType(Type t, params string[] subDirParts)
+    {
+        var path = Path.GetDirectoryName(t.Assembly.Location)!;
         if (subDirParts.Any())
             path = StaticPathUtil.Combine(path, subDirParts);
         return new PathUtil(path);
     }
 
-    public string GetRelativePath(string path) => StaticPathUtil.GetRelativePath(path, BasePath);
-    public string GetAbsolutePath(string path) => StaticPathUtil.GetAbsolutePath(path, BasePath);
-
-    public static string GetRelativePath(string fullPath, string basePath)
-        => StaticPathUtil.GetRelativePath(fullPath, basePath);
-
-    public static string GetAbsolutePath(string relPath, string basePath) =>
-        StaticPathUtil.GetAbsolutePath(relPath, basePath);
+    public string GetRelativePath(string path) => StaticPathUtil.GetRelativePath(BasePath, path);
+    public string GetAbsolutePath(string path) => StaticPathUtil.GetAbsolutePath(BasePath, path);
+    public string GetAbsolutePath(params string[] paths) => StaticPathUtil.GetAbsolutePath(BasePath, paths);
 
     public  string Combine(string first, params string[] parts) => StaticPathUtil.Combine(new[] { BasePath, first }.Union(parts).ToArray());
     public string Combine(params string[] parts) => StaticPathUtil.Combine(new[] { BasePath }.Union(parts).ToArray());
@@ -40,31 +40,37 @@ public class PathUtil
 
 public static class StaticPathUtil
 {
-    public static string GetRelativePath(string fullPath, string? basePath = null)
+    public static string GetRelativePath(string basePath, params string[] fullPath)
     {
-        if (!Path.IsPathRooted(fullPath)) return fullPath;
         basePath = GetBasePath(basePath);
+        if (!fullPath.Any())
+            return basePath;
+        if (!Path.IsPathRooted(fullPath.First())) return Combine(fullPath);
+        
 
-        if (!basePath.EndsWith("\\"))
-            basePath += "\\";
+        if (!basePath.EndsWith(Path.PathSeparator.ToString()))
+            basePath += Path.PathSeparator.ToString();
 
         var baseUri = new Uri(basePath);
-        var fullUri = new Uri(fullPath);
+        var fullUri = new Uri(Combine(fullPath));
 
         var relativeUri = baseUri.MakeRelativeUri(fullUri);
 
         // Uri's use forward slashes so convert to the preferred separator.
-        return relativeUri.ToString().Replace('/', Path.DirectorySeparatorChar);
+        return relativeUri.ToString().Replace('/', Path.PathSeparator);
     }
 
-    public static string GetAbsolutePath(string relPath, string? basePath = null)
+    public static string GetAbsolutePath(string basePath, params string[] relPath )
     {
-        if (Path.IsPathRooted(relPath))
-            return relPath;
+        if(!relPath.Any())
+            return basePath;
+        
+        if (Path.IsPathRooted(relPath.First()))
+            return Combine(relPath);
 
         var newPath = Path
-            .GetFullPath(new Uri(Path.Combine(GetBasePath(basePath), relPath)).LocalPath);
-        return newPath.Replace('/', Path.PathSeparator);
+            .GetFullPath(new Uri(Combine(GetBasePath(basePath), Combine(relPath))).LocalPath);
+        return newPath.Replace('/', Path.PathSeparator).Replace('\\', Path.PathSeparator);
     }
 
     private static string GetBasePath(string? basePath)
