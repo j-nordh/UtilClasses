@@ -19,9 +19,9 @@ namespace UtilClasses.Interfaces
         int Count { get; }
     }
 
-    public interface IHasWriteGuid
+    public interface IHasWriteGuid : IHasGuid
     {
-        Guid Id { get; set; }
+        new Guid Id { get; set; }
     }
 
     public interface IHasGuidSetter
