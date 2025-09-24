@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using JetBrains.Annotations;
 using UtilClasses.Core.Extensions.Dictionaries;
+using UtilClasses.Core.Tasking;
 
 namespace UtilClasses.Dataflow
 {
@@ -25,7 +27,7 @@ namespace UtilClasses.Dataflow
                 id = Guid.NewGuid();
 
             var link = null == predicate
-                ? src.LinkTo(trg, new DataflowLinkOptions() { PropagateCompletion = true })
+                ? src.LinkTo(trg, new DataflowLinkOptions() { PropagateCompletion = true})
                 : src.LinkTo(trg, new DataflowLinkOptions() { PropagateCompletion = true }, new Predicate<T>(predicate));
             _links.GetOrAdd(id).Add(link);
             _stuff.GetOrAdd(id).AddRange(new object[] { src, trg });
@@ -64,33 +66,38 @@ namespace UtilClasses.Dataflow
         #region Peeking
 
         public Guid Peek<T>(ISourceBlock<T> src, Action<T> peeker, ITargetBlock<T> trg, int maxDegrees = -1)
-            => ActuallyPeek(src, GetTransformBlock(peeker, maxDegrees), trg);
+            => ActuallyPeek(src, GetTransformBlock(peeker, maxDegrees), trg, null);
+        public Guid Peek<T>(ISourceBlock<T> src, AsyncEvent<T> peeker, ITargetBlock<T> trg, int maxDegrees = -1)
+            => ActuallyPeek(src, GetTransformBlock<T>(peeker.Invoke, maxDegrees), trg, null);
         public Guid Peek<T>(ISourceBlock<T> src, Action<T> peeker, ITarget<T> trg, int maxDegrees = -1)
-            => ActuallyPeek(src, GetTransformBlock(peeker, maxDegrees), trg.InBlock, trg);
+            => ActuallyPeek(src, GetTransformBlock(peeker, maxDegrees), trg.InBlock, null, trg);
         public Guid Peek<T>(ISource<T> src, Action<T> peeker, ITarget<T> trg, int maxDegrees = -1)
-            => ActuallyPeek(src.OutBlock, GetTransformBlock(peeker, maxDegrees), trg.InBlock, src, trg);
+            => ActuallyPeek(src.OutBlock, GetTransformBlock(peeker, maxDegrees), trg.InBlock,null, src, trg);
         public Guid Peek<T>(ISource<T> src, Action<T> peeker, ITargetBlock<T> trg, int maxDegrees = -1)
-            => ActuallyPeek(src.OutBlock, GetTransformBlock(peeker, maxDegrees), trg, src, trg);
+            => ActuallyPeek(src.OutBlock, GetTransformBlock(peeker, maxDegrees), trg, null, src, trg);
 
         public Guid Peek<T>(ISourceBlock<T> src, Func<T, Task> peeker, ITargetBlock<T> trg, int maxDegrees = -1)
-            => ActuallyPeek(src, GetTransformBlock(peeker, maxDegrees), trg);
+            => ActuallyPeek(src, GetTransformBlock(peeker, maxDegrees), trg, null);
+        
+        public Guid Peek<T>(ISourceBlock<T> src, Func<T, Task> peeker, ITargetBlock<T> trg, Func<T, bool> predicate, int maxDegrees = -1)
+            => ActuallyPeek(src, GetTransformBlock(peeker, maxDegrees), trg, predicate, maxDegrees);
         public Guid Peek<T>(ISourceBlock<T> src, Func<T, Task> peeker, ITarget<T> trg, int maxDegrees = -1)
-            => ActuallyPeek(src, GetTransformBlock(peeker, maxDegrees), trg.InBlock, trg);
+            => ActuallyPeek(src, GetTransformBlock(peeker, maxDegrees), trg.InBlock,null, trg);
         public Guid Peek<T>(ISource<T> src, Func<T, Task> peeker, ITarget<T> trg, int maxDegrees = -1)
-            => ActuallyPeek(src.OutBlock, GetTransformBlock(peeker, maxDegrees), trg.InBlock, src, trg);
+            => ActuallyPeek(src.OutBlock, GetTransformBlock(peeker, maxDegrees), trg.InBlock, null, src, trg);
         public Guid Peek<T>(ISource<T> src, Func<T, Task> peeker, ITargetBlock<T> trg, int maxDegrees = -1)
-            => ActuallyPeek(src.OutBlock, GetTransformBlock(peeker, maxDegrees), trg, src, trg);
+            => ActuallyPeek(src.OutBlock, GetTransformBlock(peeker, maxDegrees), trg,null, src, trg);
 
-        private Guid ActuallyPeek<T>(ISourceBlock<T> src, TransformBlock<T, T> trans, ITargetBlock<T> trg, params object[] stuff)
-            => ActuallyPeek(src, trans, trg, Guid.NewGuid(), stuff);
+        private Guid ActuallyPeek<T>(ISourceBlock<T> src, TransformBlock<T, T> trans, ITargetBlock<T> trg, Func<T, bool> predicate, params object[] stuff)
+            => ActuallyPeek(src, trans, trg, predicate, Guid.NewGuid(), stuff);
 
 
-        private Guid ActuallyPeek<T>(ISourceBlock<T> src, TransformBlock<T, T> trans, ITargetBlock<T> trg, Guid id, params object[] stuff)
+        private Guid ActuallyPeek<T>(ISourceBlock<T> src, TransformBlock<T, T> trans, ITargetBlock<T> trg, Func<T, bool> predicate,Guid id, params object[] stuff)
         {
             if (id == Guid.Empty)
                 id = Guid.NewGuid();
 
-            ActuallyLink(src, trans, id);
+            ActuallyLink(src, trans, predicate, id);
             ActuallyLink(trans, trg, id);
             _stuff.GetOrAdd(id).Add(new object[] { });
             _stuff.GetOrAdd(id).Add(stuff);
@@ -106,6 +113,16 @@ namespace UtilClasses.Dataflow
             new(GetRunner(transformer, exceptionHandler), GetMaxDegrees(maxDegrees));
 
         public static TransformBlock<T, T> GetTransformBlock<T>(Func<T, Task> trans, int maxDegrees, Action<Exception> exceptionHandler = null)
+        {
+            var runner = GetRunner(trans, exceptionHandler);
+            T F(T x)
+            {
+                runner(x);
+                return x;
+            }
+            return new TransformBlock<T, T>((Func<T, T>) F, GetMaxDegrees(maxDegrees));
+        }
+        public static TransformBlock<T, T> GetTransformBlock<T>(Func<T, CancellationToken, Task> trans, int maxDegrees, Action<Exception> exceptionHandler = null)
         {
             var runner = GetRunner(trans, exceptionHandler);
             T F(T x)
@@ -136,6 +153,8 @@ namespace UtilClasses.Dataflow
         public Guid LinkToAction<T>(ISourceBlock<T> src, Action<T> action) => ActuallyLink(src, GetActionBlock(action, -1));
         public Guid LinkToAction<T>(ISourceBlock<T> src, Action<T> action, int maxDegrees) => ActuallyLink(src, GetActionBlock(action, maxDegrees));
         public Guid LinkToAction<T>(ISourceBlock<T> src, Func<T, Task> action) => ActuallyLink(src, GetActionBlock(action, -1));
+        public Guid LinkToAction<T>(ISourceBlock<T> src, Func<T, CancellationToken, Task> action) => ActuallyLink(src, GetActionBlock(action, -1));
+        public Guid LinkToAction<T>(ISourceBlock<T> src, AsyncEvent<T> e) => ActuallyLink(src, GetActionBlock<T>(e.Invoke, -1));
         public Guid LinkToAction<T>(ISourceBlock<T> src, Func<T, Task> action, int maxDegrees) => ActuallyLink(src, GetActionBlock(action, maxDegrees));
         public Guid LinkToAction<T>(ISourceBlock<T> src, Func<T, Task> action, Action<Exception> exceptionHandler) => ActuallyLink(src, GetActionBlock(action, -1, exceptionHandler));
         public Guid LinkToAction<T>(ISource<T> src, Func<T, Task> action) => ActuallyLink(src.OutBlock, GetActionBlock(action, -1), null, Guid.NewGuid(), src);
@@ -177,6 +196,8 @@ namespace UtilClasses.Dataflow
 
         public static ITargetBlock<T> GetActionBlock<T>(Func<T, Task> action, int maxDegrees, Action<Exception> exceptionHandler = null)
             => new ActionBlock<T>(GetRunner(action, exceptionHandler), GetMaxDegrees(maxDegrees));
+        public static ITargetBlock<T> GetActionBlock<T>(Func<T, CancellationToken, Task> action, int maxDegrees, Action<Exception> exceptionHandler = null)
+            => new ActionBlock<T>(GetRunner(action, exceptionHandler), GetMaxDegrees(maxDegrees));
 
         private static Func<T, Task> GetRunner<T>(Func<T, Task> func, Action<Exception> exceptionHandler)
         {
@@ -187,6 +208,22 @@ namespace UtilClasses.Dataflow
                 try
                 {
                     await func(x);
+                }
+                catch (Exception e)
+                {
+                    exceptionHandler?.Invoke(e);
+                }
+            };
+        }
+        private static Func<T, Task> GetRunner<T>(Func<T, CancellationToken, Task> func, Action<Exception> exceptionHandler)
+        {
+            if (null == exceptionHandler)
+                return x=>func(x, CancellationToken.None);
+            return async x =>
+            {
+                try
+                {
+                    await func(x, CancellationToken.None);
                 }
                 catch (Exception e)
                 {
@@ -240,7 +277,7 @@ namespace UtilClasses.Dataflow
             {
                 try
                 {
-                    action(x);
+                    action?.Invoke(x);
                 }
                 catch (Exception e)
                 {

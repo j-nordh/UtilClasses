@@ -74,7 +74,11 @@ public static class DateTimeExtensions
     public static bool TryParseUtc(this string? s, out DateTime dt)
         => DateTime.TryParse(s, null, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out dt);
 
-    public static bool Between(this DateTime? dt, DateTime low, DateTime high, bool inclusive = true)
+    public static bool Between(this DateTime? dt, DateTime? low, DateTime high, bool inclusive = true)
+        => inclusive
+            ? dt >= low && dt <= high
+            : dt > low && dt < high;
+    public static bool Between(this DateTime dt, DateTime? low, DateTime high, bool inclusive = true)
         => inclusive
             ? dt >= low && dt <= high
             : dt > low && dt < high;

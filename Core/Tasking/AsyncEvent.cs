@@ -8,32 +8,24 @@ namespace UtilClasses.Core.Tasking;
 
 public interface IAsyncEvent
 {
-    
-    Guid SubscribeGuid(Func<CancellationToken, Task> f);
-    IDisposable SubscribeTicket(Func<CancellationToken, Task> f);
     bool Unsubscribe(Guid id);
+    Action<Exception>? ExceptionHandler { set; }    
 }
-public interface IAsyncEvent<out T>
+public interface IAsyncEvent<out T>:IAsyncEvent
 {
     Guid SubscribeGuid(Func<T, CancellationToken, Task> f);
     IDisposable SubscribeTicket(Func<T, CancellationToken, Task> f);
-    bool Unsubscribe(Guid id);
 }
 
 public static class AsyncEventExtensions
 {
-    public static Guid SubscribeGuid(this IAsyncEvent e, Action<CancellationToken> a) => e.SubscribeGuid(a.AsTask());
-    public static Guid SubscribeGuid(this IAsyncEvent e, Action a) => e.SubscribeGuid(a.AsTaskWithCt());
-    public static IDisposable SubscribeTicket(this IAsyncEvent e, Action<CancellationToken> a) => e.SubscribeTicket(a.AsTask());
-    public static IDisposable SubscribeTicket(this IAsyncEvent e, Action a) => e.SubscribeTicket(a.AsTaskWithCt());
-
     public static Guid SubscribeGuid<T>(this IAsyncEvent<T> e, Action<T, CancellationToken> a) => e.SubscribeGuid(a.AsTask());
     public static Guid SubscribeGuid<T>(this IAsyncEvent<T> e, Action<T> a) => e.SubscribeGuid(a.AsTaskWithCt());
     public static IDisposable SubscribeTicket<T>(this IAsyncEvent<T> e, Action<T,CancellationToken> a) => e.SubscribeTicket(a.AsTask());
     public static IDisposable SubscribeTicket<T>(this IAsyncEvent<T> e, Action<T> a) => e.SubscribeTicket(a.AsTaskWithCt());
 }
 
-public abstract class AsyncEventBase<T>
+public abstract class AsyncEventBase<T>:IAsyncEvent
 {
     //protected readonly bool _parallel;
     //private readonly bool _background;
@@ -69,6 +61,7 @@ public abstract class AsyncEventBase<T>
     }
 
     public bool Unsubscribe(Guid id) => _funcs.Remove(id);
+    public Action<Exception>? ExceptionHandler { protected get; set; }
 }
 public class AsyncEvent:AsyncEventBase<Func<CancellationToken, Task>>,IAsyncEvent
 {
@@ -85,13 +78,23 @@ public class AsyncEvent:AsyncEventBase<Func<CancellationToken, Task>>,IAsyncEven
 public class AsyncEvent<T>: AsyncEventBase<Func<T,CancellationToken, Task>>, IAsyncEvent<T>
 {
     public Guid SubscribeGuid(Action<T, CancellationToken> a) => SubscribeGuid(a.AsTask());
+    public Guid SubscribeGuid(Action<T> a) => SubscribeGuid(a.AsTask());
+    public Guid SubscribeGuid(Func<T, Task> f) => base.SubscribeGuid(async (o,_)=> await f(o));
     
     public async Task Invoke(T arg, CancellationToken ct = default)
     {
-        foreach (var f in _funcs.Values)
+        try
         {
-            await f(arg, ct);
+            foreach (var f in _funcs.Values)
+            {
+                await f(arg, ct);
+            }
         }
+        catch (Exception e)
+        {
+            ExceptionHandler?.Invoke(e);
+        }
+
     }
 
     

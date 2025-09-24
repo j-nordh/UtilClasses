@@ -22,6 +22,12 @@ public static class SemaphoreExtensions
         await sem.ActualOnAsync(ct, f, exceptionHandler);
     }
 
+    public static async Task WaitManyAsync(this SemaphoreSlim sem, int x, int timeout, CancellationToken ct = default)
+    {
+        for (int i = 0; i < x; i++)
+            await sem.WaitAsync(timeout, ct);
+    }
+
     private class Ticket : IDisposable
     {
         private readonly SemaphoreSlim _sem;
