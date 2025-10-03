@@ -12,9 +12,9 @@ public static class ListExtensions
         list.Add(new Tuple<T1, T2>(v1, v2));
     }
 
-    public static void Shuffle<T>(this List<T> list)
+    public static void Shuffle<T>(this List<T> list, Random? rnd = null)
     {
-        var rnd = new Random();
+        rnd ??= new Random();
         for (var i = 0; i < list.Count; ++i)
         {
             var i1 = rnd.Next(list.Count);

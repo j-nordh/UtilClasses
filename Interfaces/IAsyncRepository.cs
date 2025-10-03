@@ -12,14 +12,14 @@ public interface IAsyncRepository
 
 public interface IAsyncRRepository<T> : IAsyncRepository
 {
-    Task<List<T>> Get();
+    Task<List<T>> GetAsync();
     Task<int> Count();
 }
 
 public interface IAsyncRRepository<in TKey, T> : IAsyncRRepository<T>
 {
-    Task<T?> Get(TKey id);
-    Task<List<T>> Get(IEnumerable<TKey> ids);
+    Task<T?> GetAsync(TKey id);
+    Task<List<T>> GetAsync(IEnumerable<TKey> ids);
 }
 
 public interface IAsyncCruRepository<TKey, T> : IAsyncRRepository<TKey, T>

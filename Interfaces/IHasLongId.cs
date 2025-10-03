@@ -29,9 +29,13 @@ namespace UtilClasses.Interfaces
         void SetGuid(Guid id);
     }
 
-    public interface IHasName
+    public interface IHasName : IHasReadonlyName
     {
-        string Name { get; set; }
+        new string Name { get; set; }
+    }
+    public interface IHasReadonlyName
+    {
+        string Name { get; }
     }
 
     public interface IHasNameGuid : IHasGuid, IHasName

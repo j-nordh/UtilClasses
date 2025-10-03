@@ -16,16 +16,16 @@ namespace UtilClasses.Services.Api
 
     public class CrudController<TKey, T> : CruControllerBase<TKey, T>, ICrudController<TKey, T> where T : class, IHasId<TKey>
     {
-        private readonly IAsyncCrudRepository<TKey, T> _man;
+        protected readonly IAsyncCrudRepository<TKey, T> _repo;
 
-        public CrudController(IAsyncCrudRepository<TKey, T> man) : base(man)
+        public CrudController(IAsyncCrudRepository<TKey, T> repo) : base(repo)
         {
-            _man = man;
+            _repo = repo;
         }
 
         [Route("{id}")]
         [HttpDelete]
         [SwaggerOperation("Deletes a single object as specified by the supplied Id")]
-        public virtual async Task Delete(TKey id) => await _man.Delete(id);
+        public virtual async Task Delete(TKey id) => await _repo.Delete(id);
     }
 }
