@@ -31,6 +31,7 @@ public class ConsoleWriter
 
 
     public ConsoleWriter Write(string s) => DoWrite(s);
+    public ConsoleWriter Write(ConsoleColor color, string s) => WithColor(color, ()=>Write(s));
 
     public ConsoleWriter Write(bool predicate, string s)
     {
@@ -39,7 +40,15 @@ public class ConsoleWriter
         return this;
     }
     public ConsoleWriter WriteLine() => DoWriteLine("");
+    public ConsoleWriter WriteLines(params string[] ss)
+    {
+        ss.ForEach(DoWriteLine);
+        return this;
+    }
+    public ConsoleWriter WriteLines(ConsoleColor color, params string[] ss) => WithColor(color, () => ss.ForEach(DoWriteLine));
+
     public ConsoleWriter WriteLine(string s) => DoWriteLine(s);
+    public ConsoleWriter WriteLine(ConsoleColor color, string s) => WithColor(color, ()=> DoWriteLine(s));
     public ConsoleWriter WriteLine(object o) => DoWriteLine(o.ToString());
 
     public ConsoleWriter SetIndent(string s) => Do(() => Indent = s);

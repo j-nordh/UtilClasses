@@ -46,10 +46,10 @@ public static class StringUtil
 
     private static Func<string, string> Trim(int i) => s => s.Substring(0, s.Length - i);
 
-    public static string ToSingle(string plural)
+    public static string ToSingle(this string plural)
     {
         if (plural.StartsWith("tbl"))
-            plural = plural.SubstringAfter("tbl");
+            plural = plural.SubstringAfter("tbl")!;
         foreach (var t in _singleTransforms.Where(t => t.Predicate(plural)))
         {
             return t.Transform(plural);

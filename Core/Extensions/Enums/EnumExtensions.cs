@@ -127,6 +127,16 @@ public class Enum<T> where T : struct, Enum, IConvertible, IComparable
         }
     }
 
+    public static T Random(Random? rnd= null)
+    {
+        rnd ??= new Random();
+        RequireEnum();
+
+        var lst = Values;
+        var index = rnd.Next(0, lst.Count);
+        return lst[index];
+    }
+
     public static bool Is(T e, params T[] needles) => needles.Any(n => e.CompareTo(n) == 0);
 
     public static IEnumerable<string> DescOrNames => Values.Select(DescriptionOrName);

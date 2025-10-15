@@ -725,6 +725,8 @@ public static class StringExtensions
 
     public static bool ContainsAny(this string value, params string[] needles) =>
         value.ContainsAny(needles.AsEnumerable());
+    public static bool ContainsAny(this string value, params char[] needles) =>
+        value.ContainsAny(needles.Select(c=>c.ToString()).AsEnumerable());
 
     public static bool ContainsANumber(this string value) =>
         value.ContainsAny(Enumerable.Range(0, 10).Select(i => i.ToString()));
