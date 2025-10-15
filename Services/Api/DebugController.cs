@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using UtilClasses.Core;
 using UtilClasses.Core.Extensions.Dictionaries;
+using UtilClasses.Core.Extensions.Exceptions;
 using UtilClasses.Core.Extensions.Strings;
 using UtilClasses.Core.Extensions.Types;
 using UtilClasses.Core.Files;
@@ -101,7 +102,7 @@ public class DebugController : Controller
     }
 
     [HttpGet("di")]
-    public Dictionary<string, List<string>> DependecyInjectionProblems(bool hideOk = false)
+    public Dictionary<string, List<string>> DependecyInjectionProblems(bool hideOk = false, bool verbose=false)
     {
         var serviceProvider = _serviceCollection.BuildServiceProvider();
         var res = new DictionaryOic<List<string>>();
@@ -123,7 +124,8 @@ public class DebugController : Controller
             }
             catch (Exception e)
             {
-                res.GetOrAdd("Problems").Add($"{serviceType.SaneName()}: {e.Message}");
+                var msg = verbose ? e.DeepToString() : e.Message;
+                res.GetOrAdd("Problems").Add($"{serviceType.SaneName()}: {msg}");
             }
         }
 
