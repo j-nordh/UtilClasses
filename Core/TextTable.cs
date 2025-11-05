@@ -18,29 +18,45 @@ public partial class TextTable
     protected TableWriter _writer;
     public bool ShowHeader { get; set; }
     public int SpacerInterval { get; set; }
+
     private class IndentingTableWriter : TableWriter
     {
-
         public IndentingTableWriter(IndentingStringBuilder sb) : base(sb)
         {
         }
-        public override void Begin() { }
-        public override void End() { }
+
+        public override void Begin()
+        {
+        }
+
+        public override void End()
+        {
+        }
+
         public override void Write(string s) => Sb.Append(s);
         public override void Write(char c) => Sb.Append(c);
         public override void WriteLine(char c) => Sb.AppendLine(c);
     }
 
-    public TextTable(IndentingStringBuilder sb, params string[] headings) : this(new IndentingTableWriter(sb), headings.ToList())
-    { }
+    public TextTable(IndentingStringBuilder sb, params string[] headings) : this(new IndentingTableWriter(sb),
+        headings.ToList())
+    {
+    }
 
-    public TextTable(IndentingStringBuilder sb, IEnumerable<string> headings) : this(new IndentingTableWriter(sb), headings)
-    { }
-    public TextTable(params string[] headings) : this(new IndentingTableWriter(new IndentingStringBuilder("  ")), headings.ToList())
-    { }
+    public TextTable(IndentingStringBuilder sb, IEnumerable<string> headings) : this(new IndentingTableWriter(sb),
+        headings)
+    {
+    }
 
-    public TextTable(IEnumerable<string> headings) : this(new IndentingTableWriter(new IndentingStringBuilder("  ")), headings)
-    { }
+    public TextTable(params string[] headings) : this(new IndentingTableWriter(new IndentingStringBuilder("  ")),
+        headings.ToList())
+    {
+    }
+
+    public TextTable(IEnumerable<string> headings) : this(new IndentingTableWriter(new IndentingStringBuilder("  ")),
+        headings)
+    {
+    }
 
     public static TextTable HiddenTrimmed(params string[] headings) => new(headings)
     {
@@ -52,7 +68,7 @@ public partial class TextTable
     public TextTable(TableWriter writer, IEnumerable<string> headings)
     {
         _headings = new Row(headings, Borders);
-        _widths = _headings.Values.Select(s => s?.Length??0).ToList();
+        _widths = _headings.Values.Select(s => s?.Length ?? 0).ToList();
         _rows = new();
         _writer = writer;
         ShowHeader = true;
@@ -60,7 +76,8 @@ public partial class TextTable
     }
 
     public TextTable AddRow(params object[] row) => AddRow(new Row(row.Select(o => o?.ToString()), Borders));
-    public TextTable AddRow(IEnumerable<string>? row) => AddRow(null== row?null: new Row(row.ToList(), Borders));
+    public TextTable AddRow(IEnumerable<string>? row) => AddRow(null == row ? null : new Row(row.ToList(), Borders));
+
     public TextTable AddRow(IEnumerable<string> values, Action<Row> config)
     {
         var row = new Row(values.ToList(), Borders);
@@ -68,6 +85,7 @@ public partial class TextTable
         config?.Invoke(row);
         return this;
     }
+
     public TextTable AddRow(TextTable.Row? r)
     {
         _rows.Add(r);
@@ -75,23 +93,26 @@ public partial class TextTable
         //update max width
         for (int i = 0; i < _headings.Values.Count && i < r.Values.Count; i++)
         {
-            foreach (var l in r.Values[i]?.SplitLines()??new string?[]{})
+            foreach (var l in r.Values[i]?.SplitLines() ?? new string?[] { })
             {
-                if(null == l) continue;
+                if (null == l) continue;
                 if (l.Length > _widths[i])
                     _widths[i] = l.Length;
             }
         }
+
         return this;
     }
 
     public TextTable AddRow(IHasTableRow o) => AddRow(o.GetTableRow());
+
     public TextTable AddRows<T>(IEnumerable<T> os, Func<T, string[]> f)
     {
-        foreach(var o in os)
+        foreach (var o in os)
         {
             AddRow(f(o).Cast<string>());
         }
+
         return this;
     }
 
@@ -100,11 +121,13 @@ public partial class TextTable
         os.ForEach(AddRow);
         return this;
     }
+
     public TextTable AddRows(IEnumerable<IEnumerable<string>> rows)
     {
         rows.ForEach(AddRow);
         return this;
     }
+
     public TextTable AddRows(int count, params string[] os)
     {
         for (int i = 0; i < count; i++)
@@ -122,13 +145,17 @@ public partial class TextTable
 
     public string Draw()
     {
-
         DrawRow(Borders.Top);
         if (ShowHeader) _headings.Render(_widths, _writer, Borders.Content);
         for (int i = 0; i < _rows.Count; i++)
         {
             if (SpacerInterval > 0 && i % SpacerInterval == 0 && i < _rows.Count - 2) DrawRow(Borders.Separator);
-            if (null == _rows[i]) { Row.RenderEmpty(_widths, _writer, Borders.Separator); continue; }
+            if (null == _rows[i])
+            {
+                Row.RenderEmpty(_widths, _writer, Borders.Separator);
+                continue;
+            }
+
             _rows[i]?.Render(_widths, _writer, Borders);
         }
 
@@ -138,15 +165,20 @@ public partial class TextTable
             ret = ret.Trim().SplitLines().Trim().Join("\n");
         return ret;
     }
+
     private void DrawRow(BorderRow r) => Row.RenderEmpty(_widths, _writer, r);
 
-    public void Spacer() => _rows.Add(null);
+    public TextTable Spacer()
+    {
+        _rows.Add(null);
+        return this;
+    }
 
     public static TextTable Merge(params (string header, string text)[] columns)
     {
         var cols = columns.Select(c => c.text.SplitLines()).ToList();
         var max = cols.Max(c => c.Length);
-        var tbl = new TextTable(columns.Select(c=>c.header).ToArray())
+        var tbl = new TextTable(columns.Select(c => c.header).ToArray())
         {
             SpacerInterval = -1,
             ShowHeader = true
@@ -157,13 +189,15 @@ public partial class TextTable
             var row = new List<string>();
             foreach (var col in cols)
             {
-                row.Add(col.Length>i?col[i]:"");
+                row.Add(col.Length > i ? col[i] : "");
             }
+
             tbl.AddRow(row);
         }
 
         return tbl;
     }
+
     public bool TrimOutput { get; set; }
 
     public TextTable WithTrimmedOutput(bool trim = true)
@@ -180,27 +214,30 @@ public class BorderHandler : ICloneable<BorderHandler>
 
     public static class Patterns
     {
-        public const string DefaultPattern =        "┌─┬┐\n" +
-                                                    "│ ││\n" +
-                                                    "├─┼┤\n" +
-                                                    "└─┴┘";
+        public const string DefaultPattern = "┌─┬┐\n" +
+                                             "│ ││\n" +
+                                             "├─┼┤\n" +
+                                             "└─┴┘";
 
-        public const string FramePattern =          "┌──┐\n" +
-                                                    "│  │\n" +
-                                                    "│  │\n" +
-                                                    "└──┘";
-        public const string NonePattern =           "    \n" +
-                                                    "    \n" +
-                                                    "    \n" +
-                                                    "    ";
-        public const string DoublePattern =         "╔═╦╗\n" +
-                                                    "║ ║║\n" +
-                                                    "╠═╬╣\n" +
-                                                    "╚═╩╝";
-        public const string DoubleFramePattern =    "╔═╤╗\n" +
-                                                    "║ │║\n" +
-                                                    "╟─┼╢\n" +
-                                                    "╚═╧╝";
+        public const string FramePattern = "┌──┐\n" +
+                                           "│  │\n" +
+                                           "│  │\n" +
+                                           "└──┘";
+
+        public const string NonePattern = "    \n" +
+                                          "    \n" +
+                                          "    \n" +
+                                          "    ";
+
+        public const string DoublePattern = "╔═╦╗\n" +
+                                            "║ ║║\n" +
+                                            "╠═╬╣\n" +
+                                            "╚═╩╝";
+
+        public const string DoubleFramePattern = "╔═╤╗\n" +
+                                                 "║ │║\n" +
+                                                 "╟─┼╢\n" +
+                                                 "╚═╧╝";
     }
 
     public static BorderHandler Default() => new(Patterns.DefaultPattern);
@@ -221,9 +258,12 @@ public class BorderHandler : ICloneable<BorderHandler>
         Bottom = o.Bottom.Clone();
         _lineOnNull = o.LineOnNull;
         _allRows = new[] { Top, Content, Separator, Bottom };
-
     }
-    public BorderHandler() : this(Patterns.DefaultPattern) { }
+
+    public BorderHandler() : this(Patterns.DefaultPattern)
+    {
+    }
+
     public BorderHandler(string pattern)
     {
         var lines = pattern.SplitLines();
@@ -250,6 +290,7 @@ public class BorderHandler : ICloneable<BorderHandler>
             _allRows.ForEach(r => r.LineOnNull = value);
         }
     }
+
     public char Between(string? prev, string? val)
     {
         return (prev, val) switch
@@ -279,7 +320,6 @@ public class BorderRow : ICloneable<BorderRow>
 
     public BorderRow()
     {
-
     }
 
     public BorderRow(BorderRow o)
@@ -315,7 +355,7 @@ public class BorderRow : ICloneable<BorderRow>
         return sb.ToString();
     }
 
-    public string Draw(List<int> widths, List<string> content, int horizontalPadding =0)
+    public string Draw(List<int> widths, List<string> content, int horizontalPadding = 0)
     {
         var sb = new IndentingStringBuilder("").Append(Left);
         for (int i = 0; i < widths.Count; i++)
@@ -329,11 +369,21 @@ public class BorderRow : ICloneable<BorderRow>
         sb.Backspace().Append(Right);
         return sb.ToString();
     }
+
     public BorderRow Clone() => new(this);
 }
 
 public static class TextTableExtensions
 {
-    public static TextTable WithSpacerInterval(this TextTable table, int interval) { table.SpacerInterval = interval; return table; }
-    public static TextTable WithSpacer(this TextTable table) { table.Spacer(); return table; }
+    public static TextTable WithSpacerInterval(this TextTable table, int interval)
+    {
+        table.SpacerInterval = interval;
+        return table;
+    }
+
+    public static TextTable WithSpacer(this TextTable table)
+    {
+        table.Spacer();
+        return table;
+    }
 }
