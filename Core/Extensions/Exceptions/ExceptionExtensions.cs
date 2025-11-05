@@ -2,31 +2,30 @@
 using System.Diagnostics;
 using System.Linq;
 using UtilClasses.Core.Extensions.Strings;
+using UtilClasses.Core.Extensions.Types;
 
 namespace UtilClasses.Core.Extensions.Exceptions;
 
 public static class ExceptionExtensions
 {
-    public static string DeepToString(this Exception ex)
+    public static string DeepToString(this Exception? ex)
     {
         if (null == ex) return "";
-        var sb= new IndentingStringBuilder("    ");
+        var sb = new IndentingStringBuilder("    ");
         sb.AppendException(ex);
         return sb.ToString();
     }
 
-    public static IndentingStringBuilder AppendException(this IndentingStringBuilder sb, Exception ex) => sb
-        .AppendLine($"Error Message: {ex.Message}")
-        .AppendLine($"Type: {ex.GetType()}")
-        .Maybe(ex.StackTrace.IsNotNullOrEmpty(), x => x
-            .AppendLine("StackTrace: ")
-            .AppendLines(ex.StackTrace.SplitRemoveEmptyEntries(Environment.NewLine)))
-        .Maybe(ex.Data.Count > 0, x => x
-            .AppendLine("Data: ").Indent()
-            .AppendObjects(ex.Data.Keys.Cast<object>(), key => $"{key}: {ex.Data[key]}")).Outdent()
-        .Maybe(ex.InnerException != null, x => x
-            .Indent(y => y
-                .AppendException(ex.InnerException)));
+    public static IndentingStringBuilder AppendException(this IndentingStringBuilder sb, Exception? ex) =>
+        ex is null
+            ? sb
+            : sb
+                .AppendLine($"{ex.GetType().SaneName()}: {ex.Message}")
+                .WithHeader(ex.StackTrace.IsNotNullOrEmpty(), "StackTrace: ", x => x
+                    .AppendLines(ex.StackTrace.SplitRemoveEmptyEntries(Environment.NewLine)))
+                .WithHeader(ex.Data.Count > 0, "Data: ", x => x
+                    .AppendObjects(ex.Data.Keys.Cast<object>(), key => $"{key}: {ex.Data[key]}"))
+                .Indent(y => y.AppendException(ex.InnerException!));
 
     public static void Throw(this Exception ex)
     {
@@ -43,7 +42,8 @@ public static class ExceptionExtensions
         var line = l <= 0 ? "" : $":line {l}";
         return $"at {sf.GetMethod()}{file}{line}";
     }
-    public static string ToFullString(this StackTrace sf) => 
+
+    public static string ToFullString(this StackTrace sf) =>
         new IndentingStringBuilder("  ")
             .AppendLines(sf.GetFrames()?.Select(ToFullString))
             .ToString();
@@ -55,11 +55,13 @@ public static class ExceptionExtensions
         return e.GetType();
     }
 }
+
 public class TracedException : Exception
 {
-    public TracedException(string message, Exception inner, string stackTrace): base(message, inner)
+    public TracedException(string message, Exception inner, string stackTrace) : base(message, inner)
     {
         StackTrace = stackTrace;
     }
+
     public override string StackTrace { get; }
 }

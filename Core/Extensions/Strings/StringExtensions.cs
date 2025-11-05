@@ -127,6 +127,25 @@ public static class StringExtensions
             .Where(s => s.IsNotNullOrEmpty());
     }
 
+    public static IEnumerable<string> Split(this string str, Func<char, bool> predicate)
+    {
+        var current = new StringBuilder();
+        foreach (var c in str)
+        {
+            if (predicate(c) && current.Length > 0)
+            {
+                yield return current.ToString();
+                current.Clear();
+            }
+            else
+            {
+                current.Append(c);
+            }
+        }
+        if (current.Length > 0)
+            yield return current.ToString();
+    }
+
     /// <summary>
     /// Checks if the <paramref name="source"/> contains the <paramref name="input"/> based on the provided <paramref name="comparison"/> rules.
     /// </summary>

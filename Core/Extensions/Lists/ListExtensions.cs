@@ -220,4 +220,15 @@ public static class ListExtensions
         }
         lst.Clear();
     }
+
+    public static T GetOrAdd<T>(this ICollection<T> lst, Func<T, bool> predicate)
+        where T : class, new() 
+    {
+        var o = lst.FirstOrDefault(predicate);
+        if (o != null) return o;
+
+        o = new T();
+        lst.Add(o);
+        return o;
+    }
 }

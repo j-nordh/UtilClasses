@@ -40,7 +40,7 @@ public static class DoubleExtensions
         float.Parse(s.Replace(".", ","), NumberStyles.Any, CultureInfo.GetCultureInfo("SV-se"));
     public static bool IsFloat(this string s, out float res) => float.TryParse(s.Replace('.', ','), NumberStyles.Any, CultureInfo.GetCultureInfo("SV-se"), out res);
     public static bool IsFloat(this string s) => s.IsFloat(out var _);
-    public static bool Eq(this float x, float y, float epsilon = 0.000f)
+    public static bool Eq(this float x, float y, float epsilon = 0.00001f)
     {
         if(Math.Abs(x) < epsilon && Math.Abs(y) < epsilon) return true;
         var sign = Math.Abs(Math.Sign(x) + Math.Sign(y));
