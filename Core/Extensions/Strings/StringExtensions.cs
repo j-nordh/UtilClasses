@@ -137,11 +137,10 @@ public static class StringExtensions
                 yield return current.ToString();
                 current.Clear();
             }
-            else
-            {
-                current.Append(c);
-            }
+
+            current.Append(c);
         }
+
         if (current.Length > 0)
             yield return current.ToString();
     }
@@ -547,19 +546,22 @@ public static class StringExtensions
         start += before.Length;
         return str.Substring(start, end - start);
     }
-    public static bool TrySubstringBetween(this string str, string before, string after, out string result, out int indexAfter,
+
+    public static bool TrySubstringBetween(this string str, string before, string after, out string result,
+        out int indexAfter,
         StringComparison sc = StringComparison.OrdinalIgnoreCase)
     {
         result = "";
         var start = str.IndexOf(before, sc);
         indexAfter = str.IndexOf(after, start + 1, sc);
         if (start == -1) return false;
-        if (indexAfter == -1)return false;
+        if (indexAfter == -1) return false;
         start += before.Length;
         result = str.Substring(start, indexAfter - start);
         indexAfter++;
         return true;
     }
+
     public static List<string> ExtractTags(this string? str, string startMarker, string endMarker,
         StringComparison sc = StringComparison.OrdinalIgnoreCase)
     {
@@ -576,7 +578,6 @@ public static class StringExtensions
 
         return lst;
     }
-
 
 
     public static string? SubstringBefore(this string? str, char needle, out string? rest,
@@ -744,8 +745,9 @@ public static class StringExtensions
 
     public static bool ContainsAny(this string value, params string[] needles) =>
         value.ContainsAny(needles.AsEnumerable());
+
     public static bool ContainsAny(this string value, params char[] needles) =>
-        value.ContainsAny(needles.Select(c=>c.ToString()).AsEnumerable());
+        value.ContainsAny(needles.Select(c => c.ToString()).AsEnumerable());
 
     public static bool ContainsANumber(this string value) =>
         value.ContainsAny(Enumerable.Range(0, 10).Select(i => i.ToString()));
