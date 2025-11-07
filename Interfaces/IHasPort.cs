@@ -1,10 +1,6 @@
-﻿using System;
+﻿namespace UtilClasses.Interfaces;
 
-namespace UtilClasses.Interfaces
+public interface IHasPort
 {
-    public interface IHasPort
-    {
-        int Port { get; }
-    }
-
+    int Port { get; }
 }
