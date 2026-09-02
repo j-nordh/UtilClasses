@@ -21,8 +21,10 @@ public class TicketKeeper
     private void EnqueueTicket(Ticket ticket)
     {
         _ticketList.Add(ticket);
-        _ticketList.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
+        SortTickets();
     }
+
+    private void SortTickets() => _ticketList.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
 
     public virtual Ticket? Get(ulong timestamp)
     {
@@ -86,6 +88,28 @@ public class TicketKeeper
     }
 
     public bool AnyBefore(ulong timestamp) => Peek(out var first) && first <= timestamp;
+
+    /// <summary>
+    /// Moves an enqueued ticket to a new timestamp, keeping its <see cref="Ticket.Tcs"/> so that
+    /// whoever is awaiting the ticket is still completed when it eventually fires. Returns false
+    /// if the ticket is no longer enqueued, i.e. <see cref="Get"/> has already handed it out.
+    /// <para>
+    /// Moving a ticket into the past makes it fire on the next timestamp it is checked against.
+    /// The queue is ordered by timestamp, so moving a ticket ahead of another one reorders them:
+    /// it is the caller's business not to move a ticket past one that has to be handled first.
+    /// </para>
+    /// </summary>
+    public bool Reschedule(Ticket ticket, ulong timestamp) => _semaphore.On(() =>
+    {
+        //By identity: Ticket is a record, so its generated equality compares members rather than
+        //instances. That happens to tell two same-valued tickets apart today, since each carries
+        //its own Tcs, but identity is what is actually meant here.
+        var idx = _ticketList.FindIndex(t => ReferenceEquals(t, ticket));
+        if (idx < 0) return false;
+        _ticketList[idx].MoveTo(timestamp);
+        SortTickets();
+        return true;
+    });
 }
 
 public class TicketKeeper<TVal> : TicketKeeper
@@ -101,10 +125,19 @@ public class TicketKeeper<TVal> : TicketKeeper
 
 public record Ticket(ulong Timestamp)
 {
-    public ulong Timestamp { get; } = Timestamp;
+    //Settable so that TicketKeeper.Reschedule can move a ticket without replacing it, which would
+    //hand the waiter a Tcs that is never completed. Note that this makes the record's generated
+    //equality and hash code mutable too, so tickets must not be used as dictionary keys.
+    public ulong Timestamp { get; private set; } = Timestamp;
     public void Handled() => Tcs.SetResult(this);
     public TaskCompletionSource<Ticket> Tcs { get; } = new();
     public void Complete() => Tcs.SetResult(this);
+
+    /// <summary>
+    /// Only for <see cref="TicketKeeper.Reschedule"/>: the keeper's queue is kept sorted by
+    /// timestamp, so a ticket that moves while enqueued has to be re-sorted by the keeper.
+    /// </summary>
+    internal void MoveTo(ulong timestamp) => Timestamp = timestamp;
 }
 
 public record Ticket<TItem>(ulong Timestamp, TItem Item) : Ticket(Timestamp)
